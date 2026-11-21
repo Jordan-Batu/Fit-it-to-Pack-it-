@@ -7,7 +7,7 @@ const ITEMS = {
   charger: { n: 'Charger', pts: 5, s: [[1]] },
   trash: { n: 'Crumpled trash', pts: 0, junk: 1, s: [[1]] },
 };
-
+/*sd*/
 const LEVEL = {
   n: 'Clutch',
   w: 4,
