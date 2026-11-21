@@ -797,5 +797,31 @@ $('lbTabs').addEventListener('click', (event) => {
   }
 });
 
+const bgm = new Audio('images/audio/intro.mp3');
+bgm.loop = true;
+bgm.volume = 0.3;
+let musicOn = true;
+
+function tryPlayMusic() {
+  if (musicOn && bgm.paused) {
+    bgm.play().catch(() => {});
+  }
+}
+
+document.addEventListener('click', tryPlayMusic, { once: true });
+
+if ($('musicBtn')) {
+  $('musicBtn').onclick = () => {
+    musicOn = !musicOn;
+    if (musicOn) {
+      bgm.play();
+      $('musicBtn').textContent = '🔊 Music: ON';
+    } else {
+      bgm.pause();
+      $('musicBtn').textContent = '🔇 Music: OFF';
+    }
+  };
+}
+
 show('title');
 
