@@ -60,6 +60,7 @@ body {
 
 body[data-s='title'] #s-title,
 body[data-s='game'] #s-game,
+body[data-s='themes'] #s-themes,
 body[data-s='levels'] #s-levels,
 body[data-s='lb'] #s-lb,
 body[data-s='about'] #s-about {
@@ -656,5 +657,15 @@ h2 {
 }
 
 body[data-s='themes'] #s-themes {
-  display: flex;
+background: rgb(1, 38, 41);
 }
+
+
+
+
+
+
+
+
+
+

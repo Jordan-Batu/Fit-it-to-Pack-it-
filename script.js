@@ -81,10 +81,10 @@ let timerId = null;
 let timeLeft = 0;
 let pendingScore = null;
 
-const LB_KEY = 'fitnpack:leaderboard';
+let LB_KEY = 'fitnpack:leaderboard';
 const NAME_KEY = 'fitnpack:lastName';
 const LB_MAX = 10;
-const PROGRESS_KEY = 'fitnpack:progress';
+let PROGRESS_KEY = 'fitnpack:progress';
 
 function loadScores() {
   try {
@@ -326,7 +326,7 @@ function renderLevels() {
     card.disabled = locked;
 
     const art = document.createElement('img');
-    art.src = `images/bags/${level.bag}.svg`;
+    art.src = `images/${level.bag}.svg`;
     art.alt = '';
 
     const title = document.createElement('b');
@@ -822,5 +822,124 @@ if ($('musicBtn')) {
     }
   };
 }
+
+/* =====================================================================
+   THEMES (added): Sports theme items, levels and the Themes buttons
+   ===================================================================== */
+
+// Sports items go into the same ITEMS table the game already uses,
+// so placing, scoring, the tray and the images all work without changes.
+// ('shoes' already exists above and is reused as the sneakers.)
+const SPORTS_ITEMS = {
+  ball: { n: 'Ball', pts: 25, s: [[1, 1], [1, 1]] },
+  tape: { n: 'Athletic tape', pts: 10, s: [[1]] },
+  'energy-drink': { n: 'Energy drink', pts: 20, s: [[1], [1], [1]] },
+  jersey: { n: 'Jersey', pts: 20, s: [[1, 1], [1, 1]] },
+  towel: { n: 'Towel', pts: 15, s: [[1], [1]] },
+  'beer-can': { n: 'Beer can', pts: 0, junk: 1, s: [[1], [1]] },
+  chips: { n: 'Chips', pts: 0, junk: 1, s: [[1], [1]] },
+};
+
+Object.assign(ITEMS, SPORTS_ITEMS);
+
+const SPORTS_LEVELS = [
+  {
+    n: 'Gym Bag',
+    bag: 'clutch',
+    w: 4,
+    h: 3,
+    time: 45,
+    penalty: 25,
+    req: ['ball', 'tape', 'towel'],
+    extra: ['energy-drink'],
+    junk: ['beer-can'],
+  },
+  {
+    n: 'Duffel',
+    bag: 'handbag',
+    w: 5,
+    h: 4,
+    time: 50,
+    penalty: 30,
+    req: ['ball', 'shoes', 'jersey', 'tape'],
+    extra: ['towel'],
+    junk: ['beer-can', 'chips'],
+  },
+  {
+    n: 'Locker Pack',
+    bag: 'backpack',
+    w: 6,
+    h: 5,
+    time: 55,
+    penalty: 40,
+    req: ['ball', 'shoes', 'tape', 'energy-drink', 'jersey', 'towel'],
+    extra: [],
+    junk: ['beer-can', 'chips'],
+  },
+  {
+    n: 'Team Trunk',
+    bag: 'suitcase',
+    w: 7,
+    h: 6,
+    time: 60,
+    penalty: 50,
+    req: ['ball', 'shoes', 'tape', 'energy-drink', 'jersey', 'towel'],
+    extra: [],
+    junk: ['beer-can', 'chips'],
+  },
+];
+
+const ORIGINAL_LEVELS = [...LEVELS];
+
+// Each theme has its own levels, progress (stars/unlocks) and leaderboard.
+const THEMES = {
+  original: {
+    levels: ORIGINAL_LEVELS,
+    progressKey: 'fitnpack:progress',
+    lbKey: 'fitnpack:leaderboard',
+  },
+  sports: {
+    levels: SPORTS_LEVELS,
+    progressKey: 'fitnpack:progress:sports',
+    lbKey: 'fitnpack:leaderboard:sports',
+  },
+};
+
+function applyTheme(name) {
+  const theme = THEMES[name] || THEMES.original;
+
+  // swap the contents of LEVELS in place so the rest of the game uses them
+  LEVELS.splice(0, LEVELS.length, ...theme.levels);
+  PROGRESS_KEY = theme.progressKey;
+  LB_KEY = theme.lbKey;
+
+  levelIndex = 0;
+  lbLevel = 1;
+  LEVEL = LEVELS[0];
+  document.body.dataset.theme = name;
+}
+
+document.addEventListener('click', (event) => {
+  // 'button' matters: applyTheme() puts data-theme on <body>, and a bare
+  // '[data-theme]' would then match EVERY click and reset the screen to levels.
+  const button = event.target.closest('button[data-theme]');
+
+  if (button) {
+    applyTheme(button.dataset.theme);
+    show('levels');
+  }
+});
+
+// Going back to the main menu resets to the Original theme, so Play
+// shows the original levels again. (Capture phase = runs before show().)
+document.addEventListener(
+  'click',
+  (event) => {
+    if (event.target.closest('[data-go="title"]')) {
+      applyTheme('original');
+    }
+  },
+  true,
+);
 
 show('title');

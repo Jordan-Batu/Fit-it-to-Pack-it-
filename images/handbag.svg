@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <title>Handbag</title>
+  <path d="M44 52 V40 Q44 18 64 18 Q84 18 84 40 V52" fill="none" stroke="#7a4417" stroke-width="5" stroke-linecap="round"/>
+  <path d="M26 50 H102 L112 106 Q113 114 104 114 H24 Q15 114 16 106 Z" fill="#c2793a" stroke="#7a4417" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M24 50 H104 L106 62 Q64 78 22 62 Z" fill="#d58f4f" stroke="#7a4417" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="56" y="66" width="16" height="14" rx="3" fill="#ffd54f" stroke="#8a6200" stroke-width="2.5"/>
+  <circle cx="64" cy="73" r="2.5" fill="#8a6200"/>
+  <path d="M26 100 H102" stroke="#f0c28f" stroke-width="2" stroke-dasharray="4 4" opacity=".8"/>
+  <path d="M30 58 Q46 66 58 62" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".3"/>
+</svg>
