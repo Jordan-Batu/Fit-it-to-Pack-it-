@@ -9,7 +9,7 @@
   --slot: #8f4e70;
   --slot-line: #a56283;
   --good: #3aa675;
-  --bad: #d1495b;
+  --bad: #e4001e;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -71,6 +71,7 @@ body[data-s='about'] #s-about {
   line-height: 1;
   font-weight: 800;
   letter-spacing: -0.04em;
+  color: #d3ff6c;
 }
 
 .sub {
@@ -78,6 +79,38 @@ body[data-s='about'] #s-about {
   margin: 0;
   opacity: 0.75;
   line-height: 1.4;
+}
+
+.overview {
+  max-width: 34ch;
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.4;
+  border: 1px solid rgb(204, 255, 64);
+  border-radius: 8px;
+  padding: 20px;
+  background:rgb(12, 19, 15);
+  color: rgb(255, 255, 255) ;
+}
+
+.mechanics {
+ max-width: 34ch;
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.4;
+  border: 1px solid rgb(204, 255, 64);
+  border-radius: 8px;
+  padding: 20px;
+  background:rgb(12, 19, 15);
+  color: rgb(255, 255, 255) ;
+}
+
+.about-header {
+color: #d3ff6c;
+}
+
+.mechanics-header {
+color: #d3ff6c;
 }
 
 .menu {
@@ -275,9 +308,9 @@ h2 {
 
 .panel {
   padding: 14px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  background: rgb(35, 50, 51);
+  border: 1px solid var(--good);
+  border-radius: 14px; 
 }
 
 .panel h2 {
@@ -350,6 +383,7 @@ h2 {
 .timer {
   font-size: 1.4rem;
   font-weight: 800;
+  color: #d3ff6c;
 }
 
 .timer.low {
