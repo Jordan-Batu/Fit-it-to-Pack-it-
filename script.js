@@ -824,4 +824,3 @@ if ($('musicBtn')) {
 }
 
 show('title');
-

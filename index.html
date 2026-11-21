@@ -17,9 +17,9 @@
         <button class="btn play" id="play" type="button">Play</button>
         <button class="btn alt" type="button" data-go="lb">Leaderboard</button>
         <button class="btn alt" type="button" data-go="about">About</button>
+        <button class="btn alt small" id="musicBtn" type="button">🔊 Music: ON</button>
       </div>
     </section>
-
 
     <section id="s-levels" class="screen">
       <h2>Select level</h2>
@@ -28,19 +28,18 @@
       <button class="btn alt back" type="button" data-go="title">← Back</button>
     </section>
 
-    
     <section id="s-game" class="screen game-screen">
       <div class="bar">
-        <button class="btn alt small" id="gameBack" type="button">← Menu</button>
+        <button class="btn alt small" id="gameBack" type="button">← Levels</button>
         <span class="timer" id="timer" aria-live="polite"></span>
         <button class="btn alt small" id="reset" type="button">Restart</button>
       </div>
 
-      <h2>Pack the clutch</h2>
+      <h2 id="lvlTitle">Pack the clutch</h2>
 
       <div class="game">
-        <div class="bagwrap">
-          <span class="tagline">CLUTCH</span>
+        <div class="bagwrap" id="bag" data-bag="clutch">
+          <span class="tagline" id="bagTag">CLUTCH</span>
           <div id="grid" role="grid" aria-label="Bag packing grid"></div>
         </div>
 
@@ -68,8 +67,13 @@
 
     <section id="s-lb" class="screen">
       <h2>Leaderboard</h2>
-      <p class="sub">No scores yet.</p>
-      <button class="btn alt back" type="button" data-go="title">← Back</button>
+      <div id="lbTabs" class="lb-tabs" role="group" aria-label="Level"></div>
+      <p class="sub" id="lbEmpty">No scores yet for this level.</p>
+      <ol id="lbList" class="lb-list"></ol>
+      <div class="row center-row">
+        <button class="btn alt back" type="button" data-go="title">← Back</button>
+        <button class="btn alt back" id="lbClear" type="button">Clear scores</button>
+      </div>
     </section>
 
     <section id="s-about" class="screen">
@@ -88,9 +92,19 @@
         <h2 id="rTitle"></h2>
         <p id="rText"></p>
 
+        <div id="saveBox" class="savebox" hidden>
+          <label for="pname">Your name</label>
+          <div class="row center-row">
+            <input id="pname" type="text" maxlength="12" autocomplete="off" placeholder="Player">
+            <button class="btn play small" id="saveScore" type="button">Save score</button>
+          </div>
+        </div>
+
         <div class="row center-row">
+          <button class="btn play" id="next" type="button" hidden>Next level</button>
           <button class="btn play" id="again" type="button">Play again</button>
-          <button class="btn alt small" id="toMenu" type="button">Menu</button>
+          <button class="btn alt small" id="toLb" type="button">Leaderboard</button>
+          <button class="btn alt small" id="toLevels" type="button">Levels</button>
         </div>
       </div>
     </div>
@@ -98,4 +112,3 @@
     <script src="script.js"></script>
   </body>
 </html>
-
