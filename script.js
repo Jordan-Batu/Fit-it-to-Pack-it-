@@ -81,7 +81,7 @@ let timerId = null;
 let timeLeft = 0;
 let pendingScore = null;
 
-let LB_KEY = 'fitnpack:leaderboard';
+const LB_KEY = 'fitnpack:leaderboard';
 const NAME_KEY = 'fitnpack:lastName';
 const LB_MAX = 10;
 let PROGRESS_KEY = 'fitnpack:progress';
@@ -107,7 +107,7 @@ const byScore = (a, b) => b.score - a.score || a.date - b.date;
 function trimScores(list) {
   const kept = [];
 
-  LEVELS.forEach((_, index) => {
+  ALL_LEVELS.forEach((_, index) => {
     kept.push(...list.filter((e) => e.level === index + 1).sort(byScore).slice(0, LB_MAX));
   });
 
@@ -175,12 +175,12 @@ function renderLeaderboard(highlightId) {
   const tabs = $('lbTabs');
   tabs.textContent = '';
 
-  LEVELS.forEach((level, index) => {
+  ALL_LEVELS.forEach((level, index) => {
     const tab = document.createElement('button');
     tab.type = 'button';
     tab.className = 'btn alt small tab';
     tab.dataset.level = index + 1;
-    tab.textContent = `${index + 1}. ${level.n}`;
+    tab.textContent = level.label || `${index + 1}. ${level.n}`;
     tab.setAttribute('aria-pressed', String(index + 1 === lbLevel));
     tabs.appendChild(tab);
   });
@@ -712,7 +712,7 @@ $('done').onclick = () => {
   $('again').className = canNext ? 'btn alt small' : 'btn play';
 
   $('rText').textContent = `Items +${baseScore}, time bonus +${bonus}${junkCount ? `, junk −${penalty}` : ''}. Total ${score} points.${note}`;
-  pendingScore = { score, stars, level: levelIndex + 1 };
+  pendingScore = { score, stars, level: levelIndex + 1 + LEVEL_OFFSET };
   $('pname').value = getLastName();
   $('pname').disabled = false;
   $('saveScore').disabled = false;
@@ -766,7 +766,7 @@ document.addEventListener('click', (event) => {
 $('play').onclick = () => show('levels');
 $('toLb').onclick = () => {
   $('result').classList.remove('show');
-  lbLevel = levelIndex + 1;
+  lbLevel = levelIndex + 1 + LEVEL_OFFSET;
   show('lb');
 };
 $('gameBack').onclick = $('toLevels').onclick = () => {
@@ -824,12 +824,9 @@ if ($('musicBtn')) {
 }
 
 /* =====================================================================
-   THEMES (added): Sports theme items, levels and the Themes buttons
+    Sports theme items, levels and the Themes buttons
    ===================================================================== */
 
-// Sports items go into the same ITEMS table the game already uses,
-// so placing, scoring, the tray and the images all work without changes.
-// ('shoes' already exists above and is reused as the sneakers.)
 const SPORTS_ITEMS = {
   ball: { n: 'Ball', pts: 25, s: [[1, 1], [1, 1]] },
   tape: { n: 'Athletic tape', pts: 10, s: [[1]] },
@@ -891,37 +888,43 @@ const SPORTS_LEVELS = [
 
 const ORIGINAL_LEVELS = [...LEVELS];
 
+// One shared leaderboard: Original levels are 1-4, Sports levels are saved as 5-8.
+let LEVEL_OFFSET = 0;
+
+const ALL_LEVELS = [
+  ...ORIGINAL_LEVELS.map((level, index) => ({ ...level, label: `${index + 1}. ${level.n}` })),
+  ...SPORTS_LEVELS.map((level, index) => ({ ...level, label: `Sports ${index + 1}. ${level.n}` })),
+];
+
 // Each theme has its own levels, progress (stars/unlocks) and leaderboard.
 const THEMES = {
   original: {
     levels: ORIGINAL_LEVELS,
     progressKey: 'fitnpack:progress',
-    lbKey: 'fitnpack:leaderboard',
+    offset: 0,
   },
   sports: {
     levels: SPORTS_LEVELS,
     progressKey: 'fitnpack:progress:sports',
-    lbKey: 'fitnpack:leaderboard:sports',
+    offset: ORIGINAL_LEVELS.length,
   },
 };
 
 function applyTheme(name) {
   const theme = THEMES[name] || THEMES.original;
 
-  // swap the contents of LEVELS in place so the rest of the game uses them
   LEVELS.splice(0, LEVELS.length, ...theme.levels);
   PROGRESS_KEY = theme.progressKey;
-  LB_KEY = theme.lbKey;
+  LEVEL_OFFSET = theme.offset;
 
   levelIndex = 0;
-  lbLevel = 1;
+  lbLevel = 1 + LEVEL_OFFSET;
   LEVEL = LEVELS[0];
   document.body.dataset.theme = name;
 }
 
 document.addEventListener('click', (event) => {
-  // 'button' matters: applyTheme() puts data-theme on <body>, and a bare
-  // '[data-theme]' would then match EVERY click and reset the screen to levels.
+  
   const button = event.target.closest('button[data-theme]');
 
   if (button) {
@@ -930,8 +933,6 @@ document.addEventListener('click', (event) => {
   }
 });
 
-// Going back to the main menu resets to the Original theme, so Play
-// shows the original levels again. (Capture phase = runs before show().)
 document.addEventListener(
   'click',
   (event) => {
@@ -941,5 +942,23 @@ document.addEventListener(
   },
   true,
 );
+
+// One-time: move scores saved earlier under the separate Sports key into the main leaderboard.
+(() => {
+  try {
+    const old = JSON.parse(localStorage.getItem('fitnpack:leaderboard:sports'));
+
+    if (Array.isArray(old)) {
+      const moved = old
+        .filter((e) => e && typeof e.score === 'number' && typeof e.name === 'string')
+        .map((e) => ({ ...e, level: (Number(e.level) || 1) + ORIGINAL_LEVELS.length }));
+
+      storeScores(trimScores([...loadScores(), ...moved]));
+      localStorage.removeItem('fitnpack:leaderboard:sports');
+    }
+  } catch (error) {
+  
+  }
+})();
 
 show('title');
