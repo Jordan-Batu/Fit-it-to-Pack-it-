@@ -60,6 +60,7 @@ body {
 
 body[data-s='title'] #s-title,
 body[data-s='game'] #s-game,
+body[data-s='levels'] #s-levels,
 body[data-s='lb'] #s-lb,
 body[data-s='about'] #s-about {
   display: flex;
@@ -229,7 +230,7 @@ h2 {
 
 .tagline {
   position: absolute;
-  top: 10px;
+  top: -14px;
   right: -6px;
   padding: 4px 10px;
   background: var(--tag);
@@ -454,3 +455,202 @@ h2 {
   }
 }
 
+
+.savebox {
+  margin-top: 14px;
+}
+
+.savebox label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.savebox input {
+  width: 9em;
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.savebox input:focus-visible {
+  outline: 3px solid var(--tag);
+  outline-offset: 2px;
+}
+
+.lb-list {
+  width: min(420px, 100%);
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 2em 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: left;
+}
+
+.lb-row.me {
+  border-color: var(--tag);
+  box-shadow: 0 0 0 2px var(--tag);
+}
+
+.lb-rank {
+  font-weight: 800;
+  color: var(--tag);
+}
+
+.lb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.lb-stars {
+  color: var(--tag);
+  letter-spacing: 2px;
+}
+
+.lb-score {
+  min-width: 3em;
+  text-align: right;
+  font-weight: 800;
+}
+
+/* hidden attribute must win over .btn display rules */
+[hidden] {
+  display: none !important;
+}
+
+/* ---- level select ---- */
+.level-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  width: min(460px, 100%);
+  margin-top: 12px;
+}
+
+.level-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.level-card:hover:not(:disabled) {
+  border-color: var(--tag);
+}
+
+.level-card:focus-visible {
+  outline: 3px solid var(--tag);
+  outline-offset: 2px;
+}
+
+.level-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.level-card img {
+  width: 84px;
+  height: 84px;
+}
+
+.lv-stars {
+  color: var(--tag);
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+/* ---- leaderboard tabs ---- */
+.lb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.lb-tabs .tab[aria-pressed='true'] {
+  background: var(--tag);
+  border-color: var(--tag);
+  color: var(--tag-ink);
+}
+
+/* ---- bag variants (one per level) ---- */
+.bagwrap[data-bag='handbag'] {
+  --bag: #a8512b;
+  --slot: #bf6a43;
+  --slot-line: #d4835c;
+  margin-top: 28px;
+  border-radius: 30px 30px 20px 20px;
+}
+
+.bagwrap[data-bag='handbag']::before {
+  top: -24px;
+  width: 62%;
+  height: 36px;
+}
+
+.bagwrap[data-bag='backpack'] {
+  --bag: #2f6f5e;
+  --slot: #418a77;
+  --slot-line: #58a38f;
+  margin-top: 20px;
+  border-radius: 46px 46px 18px 18px;
+}
+
+.bagwrap[data-bag='backpack']::before {
+  top: -16px;
+  width: 24%;
+  height: 24px;
+}
+
+.bagwrap[data-bag='suitcase'] {
+  --bag: #3b4a8c;
+  --slot: #4d5fa8;
+  --slot-line: #6376be;
+  margin-top: 22px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='suitcase']::before {
+  top: -14px;
+  width: 32%;
+  height: 16px;
+  border-radius: 6px 6px 0 0;
+}
+
+.bagwrap[data-bag='suitcase']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
