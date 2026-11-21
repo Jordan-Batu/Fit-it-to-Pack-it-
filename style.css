@@ -669,3 +669,836 @@ background: rgb(1, 38, 41);
 
 
 
+
+
+/* ---- nickname popup ---- */
+#nameModal {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 20, 15, 0.6);
+}
+
+#nameModal.show {
+  display: grid;
+}
+
+#nameModal .box {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 18px;
+  text-align: center;
+}
+
+#nameModal h2 {
+  margin: 0 0 6px;
+}
+
+#nameModal .savebox input {
+  width: 100%;
+  text-align: center;
+}
+
+.nameerr {
+  min-height: 1.2em;
+  margin: 6px 0 0;
+  color: var(--bad);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rtotal {
+  margin: 8px 0 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* leaderboard rows now show: rank, name, levels done, stars, theme total */
+.lb-row {
+  grid-template-columns: 2em 1fr auto auto auto;
+}
+
+.lb-lvls {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ---- blocked (sewn-shut) bag cells ---- */
+.cell.blocked {
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.45) 0 6px, rgba(0, 0, 0, 0.3) 6px 12px);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+/* ---- new bags (levels 5-7) ---- */
+.bagwrap[data-bag='tote'] {
+  --bag: #a9863f;
+  --slot: #bf9d52;
+  --slot-line: #d3b46e;
+  margin-top: 26px;
+  border-radius: 10px 10px 24px 24px;
+}
+
+.bagwrap[data-bag='tote']::before {
+  top: -24px;
+  width: 54%;
+  height: 34px;
+}
+
+.bagwrap[data-bag='sling'] {
+  --bag: #2c5a6b;
+  --slot: #3b7287;
+  --slot-line: #5190a5;
+  margin-top: 20px;
+  border-radius: 22px 22px 40px 40px;
+}
+
+.bagwrap[data-bag='sling']::before {
+  top: -16px;
+  width: 20%;
+  height: 22px;
+}
+
+.bagwrap[data-bag='duffel'] {
+  --bag: #8a2d2d;
+  --slot: #a34242;
+  --slot-line: #bd5a5a;
+  margin-top: 24px;
+  border-radius: 60px 60px 24px 24px;
+}
+
+.bagwrap[data-bag='duffel']::before {
+  top: -22px;
+  width: 44%;
+  height: 30px;
+}
+
+
+/* ---- school bags ---- */
+.bagwrap[data-bag='pencilcase'] {
+  --bag: #2e7d32;
+  --slot: #43a047;
+  --slot-line: #66bb6a;
+  margin-top: 14px;
+  border-radius: 40px;
+}
+
+.bagwrap[data-bag='pencilcase']::before {
+  top: 44%;
+  left: 14px;
+  right: 14px;
+  width: auto;
+  height: 0;
+  border: 0;
+  border-top: 4px dashed rgba(0, 0, 0, 0.35);
+  border-radius: 0;
+  transform: none;
+  display: none;
+}
+
+.bagwrap[data-bag='satchel'] {
+  --bag: #7a4a24;
+  --slot: #976038;
+  --slot-line: #b27a4e;
+  margin-top: 26px;
+  border-radius: 14px 14px 26px 26px;
+}
+
+.bagwrap[data-bag='satchel']::before {
+  top: -22px;
+  width: 40%;
+  height: 32px;
+}
+
+.bagwrap[data-bag='locker'] {
+  --bag: #52667d;
+  --slot: #657c96;
+  --slot-line: #7f97b1;
+  margin-top: 12px;
+  border-radius: 6px;
+  border: 4px solid #34495e;
+}
+
+.bagwrap[data-bag='locker']::before {
+  display: none;
+}
+
+.bagwrap[data-bag='trolley'] {
+  --bag: #5b3fa0;
+  --slot: #7253bb;
+  --slot-line: #8a6ed0;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='trolley']::before {
+  top: -22px;
+  width: 22%;
+  height: 24px;
+  border-radius: 4px 4px 0 0;
+}
+
+.bagwrap[data-bag='trolley']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+
+
+/* ---- drag & drop ---- */
+.item,
+#grid {
+  touch-action: none;
+}
+
+.item {
+  cursor: grab;
+}
+
+.cell.occ {
+  cursor: grab;
+}
+
+.item img,
+.art img,
+.dragghost img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.item.ghosted {
+  opacity: 0.35;
+}
+
+.dragghost {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+}
+
+.dragghost img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+body.dragging,
+body.dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+
+/* Fit-N-Pack · theme.css (loads after style.css) */
+
+/* ============ ORIGINAL (also base for Sports / Vacation) ============ */
+body {
+  --title: #d3ff6c;
+  --glow1: rgba(211, 255, 108, 0.13);
+  --glow2: rgba(255, 122, 89, 0.12);
+  --bg: #0b1a1c;
+  --ink: #e8f3ee;
+  --card: #13282a;
+  --line: #2c4a4a;
+  background:
+    radial-gradient(900px 520px at 12% -8%, var(--glow1), transparent 60%),
+    radial-gradient(800px 520px at 100% 105%, var(--glow2), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--bg);
+  background-attachment: fixed;
+}
+
+body[data-theme='sports'] {
+  --title: #ffb15c;
+  --glow1: rgba(255, 138, 61, 0.2);
+  --glow2: rgba(90, 209, 255, 0.12);
+  --bg: #171410;
+  --card: #26201a;
+  --line: #4d4033;
+}
+
+body[data-theme='vacation'] {
+  --title: #7fe7ff;
+  --glow1: rgba(255, 214, 102, 0.2);
+  --glow2: rgba(90, 209, 255, 0.2);
+  --bg: #08202b;
+  --card: #0f3040;
+  --line: #245268;
+}
+
+body[data-s='themes'] #s-themes {
+  background: transparent;
+}
+
+.screen {
+  position: relative;
+  z-index: 1;
+}
+
+#s-title,
+#s-themes {
+  padding-bottom: 120px;
+}
+
+#decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fx-float {
+  position: absolute;
+  opacity: 0.11;
+  filter: grayscale(0.2);
+  animation: drift var(--d, 9s) ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translateY(0) rotate(var(--r)); }
+  to { transform: translateY(-38px) rotate(calc(var(--r) + 28deg)); }
+}
+
+/* title */
+.hero {
+  width: 98px;
+  height: 98px;
+  filter: drop-shadow(0 12px 8px rgba(0, 0, 0, 0.45));
+  animation: hop 1.7s ease-in-out infinite;
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-16px) rotate(5deg); }
+}
+
+.big {
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--title);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 34px color-mix(in srgb, var(--title) 40%, transparent);
+}
+
+.big span {
+  display: inline-block;
+  animation: wave 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+@keyframes wave {
+  0%, 55%, 100% { transform: translateY(0) rotate(0); }
+  28% { transform: translateY(-9px) rotate(-3deg); }
+}
+
+h2,
+.timer {
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+}
+
+.timer {
+  padding: 4px 16px;
+  color: var(--title);
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+}
+
+.timer.low {
+  color: var(--bad);
+  animation: tick 0.7s ease-in-out infinite;
+}
+
+@keyframes tick {
+  50% { transform: scale(1.12); }
+}
+
+/* buttons */
+.btn {
+  border-radius: 14px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px) rotate(-0.8deg);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.btn.alt {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn.alt:hover:not(:disabled) {
+  border-color: var(--title);
+}
+
+.btn.play {
+  background: linear-gradient(180deg, #ffd84d, #f2c230);
+  box-shadow: 0 5px 0 #a87d00, 0 0 24px rgba(242, 194, 48, 0.25);
+}
+
+#s-title .btn.play {
+  animation: glow 2.2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  50% { box-shadow: 0 5px 0 #a87d00, 0 0 36px rgba(242, 194, 48, 0.55); }
+}
+
+#s-themes .btn[data-theme] {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+
+#s-themes .btn[data-theme] img {
+  width: 42px;
+  height: 42px;
+}
+
+/* levels */
+.level-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--card), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s;
+}
+
+.level-card:hover:not(:disabled) {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.level-card .nm {
+  width: 100%;
+  padding-top: 6px;
+  border-top: 2px dashed var(--line);
+}
+
+.level-card:hover:not(:disabled) img {
+  animation: hop 0.9s ease-in-out infinite;
+}
+
+.level-card:disabled img {
+  filter: grayscale(1);
+}
+
+/* the bag */
+.bagwrap {
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), inset 0 -10px 18px rgba(0, 0, 0, 0.25);
+  outline: 2px dashed rgba(255, 255, 255, 0.35);
+  outline-offset: -8px;
+}
+
+.cell {
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+  transition: filter 0.1s;
+}
+
+.cell:hover {
+  filter: brightness(1.14);
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2)), var(--card);
+  border: 2px solid var(--good);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+}
+
+.item {
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s;
+}
+
+.item:hover {
+  transform: translateY(-3px) rotate(-1.5deg);
+}
+
+.req {
+  transform: rotate(-4deg);
+  letter-spacing: 0.04em;
+}
+
+.prog b {
+  background: repeating-linear-gradient(45deg, #5be09a 0 10px, #3aa675 10px 20px);
+  background-size: 28px 28px;
+  animation: stripes 1s linear infinite;
+}
+
+@keyframes stripes {
+  to { background-position: 28px 0; }
+}
+
+/* result popup + confetti */
+#result {
+  backdrop-filter: blur(4px);
+}
+
+#result.show .box {
+  border: 3px solid var(--tag);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes pop {
+  from { transform: scale(0.6) rotate(-4deg); opacity: 0; }
+}
+
+#stars {
+  text-shadow: 0 0 18px rgba(242, 194, 48, 0.6);
+}
+
+.confetti {
+  position: fixed;
+  top: -24px;
+  z-index: 30;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: fall var(--t) cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+
+.confetti.emo {
+  width: auto;
+  height: auto;
+  font-size: 24px;
+  line-height: 1;
+}
+
+@keyframes fall {
+  to { transform: translate(var(--x), 108vh) rotate(var(--rot)); }
+}
+
+/* conveyor belt (title + themes screens) */
+#belt {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 96px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body[data-s='title'] #belt,
+body[data-s='themes'] #belt {
+  display: block;
+}
+
+.belt-track {
+  display: flex;
+  align-items: flex-end;
+  width: max-content;
+  padding-bottom: 22px;
+  animation: belt 28s linear infinite;
+}
+
+.belt-track img {
+  height: 58px;
+  width: auto;
+  margin-right: 64px;
+  filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes belt {
+  to { transform: translateX(-50%); }
+}
+
+#belt::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22px;
+  background: repeating-linear-gradient(90deg, #1a2a2b 0 22px, #2a4143 22px 25px);
+  border-top: 3px solid #3e5a5c;
+  animation: rollers 1s linear infinite;
+}
+
+@keyframes rollers {
+  to { background-position: -25px 0; }
+}
+
+/* ============ SCHOOL: notebook paper + teacher's pen ============ */
+body[data-theme='school'] {
+  --title: #2a4d9b;
+  --bg: #fbf6e6;
+  --ink: #24324a;
+  --card: #fffdf4;
+  --line: #24324a;
+  --tag: #ffd84d;
+  --tag-ink: #3a2c00;
+  --good: #2f9e63;
+  --bad: #d6322f;
+  font-family: 'Patrick Hand', 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.08rem;
+  background:
+    radial-gradient(circle 9px at 26px 50%, #d3cbb2 0 8px, transparent 9px) 0 0 / 60px 260px repeat-y,
+    linear-gradient(90deg, transparent 0 62px, rgba(220, 60, 60, 0.6) 62px 64px, transparent 64px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(86, 140, 210, 0.35) 31px 32px),
+    #fbf6e6;
+  background-attachment: fixed;
+}
+
+body[data-theme='school'] .fx-float {
+  opacity: 0.2;
+}
+
+body[data-theme='school'] h2,
+body[data-theme='school'] .timer {
+  font-family: 'Caveat Brush', 'Patrick Hand', cursive;
+  letter-spacing: 0.02em;
+}
+
+body[data-theme='school'] h2 {
+  font-size: 2rem;
+}
+
+body[data-theme='school'] .panel h2 {
+  font-size: 1.5rem;
+}
+
+body[data-theme='school'] .big {
+  display: inline-block;
+  padding: 0 0.12em;
+  font-family: 'Caveat Brush', 'Patrick Hand', cursive;
+  letter-spacing: 0.01em;
+  color: var(--title);
+  text-shadow: none;
+  background: linear-gradient(transparent 58%, #ffe45c 58%, #ffe45c 92%, transparent 92%);
+  transform: rotate(-2deg);
+}
+
+body[data-theme='school'] .hero {
+  filter: drop-shadow(4px 6px 0 rgba(36, 50, 74, 0.25));
+}
+
+body[data-theme='school'] .sub {
+  opacity: 0.9;
+  font-size: 1.2rem;
+}
+
+body[data-theme='school'] .btn {
+  background: #fff7b8;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px 12px 8px 14px / 12px 6px 14px 8px;
+  box-shadow: 3px 4px 0 var(--ink);
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+body[data-theme='school'] .btn.alt {
+  background: var(--card);
+  border: 2px solid var(--ink);
+}
+
+body[data-theme='school'] .btn.play {
+  background: #ffd84d;
+  box-shadow: 3px 4px 0 var(--ink);
+  animation: none;
+}
+
+body[data-theme='school'] .btn:active:not(:disabled) {
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+body[data-theme='school'] .menu .btn:nth-child(odd) {
+  transform: rotate(-1.2deg);
+}
+
+body[data-theme='school'] .menu .btn:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+body[data-theme='school'] .menu .btn:hover:not(:disabled) {
+  transform: rotate(0) translateY(-2px);
+}
+
+body[data-theme='school'] .timer {
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--ink);
+  font-size: 1.5rem;
+}
+
+body[data-theme='school'] .timer.low {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+body[data-theme='school'] .level-card {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-top: 10px solid #ff7a7a;
+  border-radius: 6px;
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+body[data-theme='school'] .level-card .nm {
+  border-top-color: rgba(86, 140, 210, 0.7);
+}
+
+body[data-theme='school'] .lv-stars,
+body[data-theme='school'] .lb-stars {
+  color: #d99100;
+}
+
+body[data-theme='school'] .lb-rank {
+  color: var(--bad);
+}
+
+body[data-theme='school'] .lb-row {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+body[data-theme='school'] .bagwrap {
+  box-shadow: 6px 8px 0 rgba(36, 50, 74, 0.35);
+  outline-color: rgba(255, 255, 255, 0.6);
+}
+
+body[data-theme='school'] .panel {
+  background: #fff3a3;
+  color: #3a3000;
+  border: none;
+  border-radius: 2px 2px 16px 2px;
+  box-shadow: 5px 7px 0 rgba(36, 50, 74, 0.2);
+  transform: rotate(0.6deg);
+}
+
+body[data-theme='school'] .item {
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+body[data-theme='school'] .prog {
+  background: rgba(36, 50, 74, 0.2);
+  border: 2px solid var(--ink);
+}
+
+body[data-theme='school'] .overview,
+body[data-theme='school'] .mechanics {
+  max-width: 44ch;
+  opacity: 1;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 3px 4px 0 var(--ink);
+  font-size: 1.15rem;
+}
+
+body[data-theme='school'] .about-header,
+body[data-theme='school'] .mechanics-header {
+  color: var(--bad);
+}
+
+body[data-theme='school'] #result {
+  background: rgba(36, 50, 74, 0.45);
+}
+
+body[data-theme='school'] #result .box,
+body[data-theme='school'] #nameModal .box {
+  background:
+    linear-gradient(90deg, transparent 0 34px, rgba(220, 60, 60, 0.55) 34px 36px, transparent 36px),
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(86, 140, 210, 0.35) 27px 28px),
+    var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+}
+
+body[data-theme='school'] #result.show .box {
+  position: relative;
+  box-shadow: 6px 8px 0 rgba(36, 50, 74, 0.4);
+}
+
+body[data-theme='school'] #result .box h2 {
+  color: var(--bad);
+  transform: rotate(-2deg);
+}
+
+body[data-theme='school'] #result .box::after {
+  content: 'CHECKED ✓';
+  position: absolute;
+  top: 10px;
+  right: -8px;
+  padding: 2px 8px;
+  color: var(--bad);
+  border: 3px solid var(--bad);
+  border-radius: 6px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 1.05rem;
+  opacity: 0.8;
+  transform: rotate(10deg);
+}
+
+body[data-theme='school'] #stars {
+  color: #e0a100;
+}
+
+body[data-theme='school'] .savebox input {
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+
+/* ruler instead of conveyor belt */
+body[data-theme='school'] #belt::after {
+  height: 26px;
+  background:
+    repeating-linear-gradient(90deg, #6b5410 0 2px, transparent 2px 14px) 0 0 / 100% 11px no-repeat,
+    repeating-linear-gradient(90deg, #6b5410 0 2px, transparent 2px 70px) 0 0 / 100% 18px no-repeat,
+    #f3d77a;
+  border-top: 3px solid #6b5410;
+  animation: none;
+}
+
+body[data-theme='school'] .belt-track {
+  padding-bottom: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-float,
+  .belt-track,
+  .hero,
+  .big span,
+  #s-title .btn.play,
+  .timer.low,
+  .prog b,
+  #belt::after,
+  #result.show .box {
+    animation: none !important;
+  }
+}
