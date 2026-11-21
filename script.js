@@ -27,6 +27,42 @@ let timeLeft = 0;
 
 const $ = (id) => document.getElementById(id);
 
+let audioCtx = null;
+
+function playTone(freq, duration, type = 'sine', volume = 0.12) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+const sfx = {
+  pick: () => playTone(520, 0.06, 'sine', 0.1),
+  rotate: () => playTone(660, 0.05, 'triangle', 0.08),
+  place: () => playTone(440, 0.1, 'sine', 0.14),
+  bad: () => playTone(160, 0.18, 'sawtooth', 0.1),
+  win: () => {
+    playTone(523, 0.12, 'triangle', 0.12);
+    setTimeout(() => playTone(659, 0.12, 'triangle', 0.12), 110);
+    setTimeout(() => playTone(784, 0.22, 'triangle', 0.14), 220);
+  },
+  lose: () => {
+    playTone(300, 0.18, 'sawtooth', 0.1);
+    setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.1), 180);
+  },
+};
+
 const rotate = (matrix) =>
   matrix[0].map((_, index) => matrix.map((row) => row[index]).reverse());
 
@@ -205,6 +241,7 @@ function placeAt(row, column) {
   if (fits(item, origin)) {
     item.at = origin;
     selectedId = null;
+    sfx.place();
     hoveredCell = null;
     $('msg').textContent = 'Packed.';
     render();
@@ -213,6 +250,7 @@ function placeAt(row, column) {
       $('msg').textContent = 'Must-packs done. Add extras or finish.';
     }
   } else {
+    sfx.bad();
     $('msg').textContent = 'Doesn’t fit there. Try rotating it or another spot.';
     const targetCell = document.querySelector(`[data-r="${row}"][data-c="${column}"]`);
 
@@ -243,6 +281,7 @@ $('grid').addEventListener('click', (event) => {
     const pickedItem = items[occupiedId];
     pickedItem.at = null;
     selectedId = pickedItem.id;
+    sfx.pick();
     hoveredCell = { r: row, c: column };
     $('msg').textContent = `Picked up ${ITEMS[pickedItem.key].n}.`;
     render();
@@ -280,6 +319,7 @@ $('tray').addEventListener('click', (event) => {
 
   startTimer();
   selectedId = +button.dataset.id;
+  sfx.pick();
   hoveredCell = null;
   $('msg').textContent = `${ITEMS[items[selectedId].key].n} selected. Tap the bag to place it.`;
   render();
@@ -293,12 +333,20 @@ function rotateSelected() {
   }
 
   item.rot = (item.rot + 1) % 4;
+  sfx.rotate();
   render();
 }
 
 $('rot').onclick = rotateSelected;
 document.addEventListener('keydown', (event) => {
   if (event.key === 'r' || event.key === 'R') {
+    rotateSelected();
+  }
+});
+
+document.addEventListener('contextmenu', (event) => {
+  if (selectedId !== null && !isDone) {
+    event.preventDefault();
     rotateSelected();
   }
 });
@@ -334,6 +382,7 @@ function startTimer() {
 
 function timeUp() {
   stopTimer();
+  sfx.lose();
   isDone = true;
   selectedId = null;
   hoveredCell = null;
@@ -347,6 +396,7 @@ function timeUp() {
 
 $('done').onclick = () => {
   stopTimer();
+  sfx.win();
   isDone = true;
   selectedId = null;
   hoveredCell = null;
@@ -400,3 +450,4 @@ $('gameBack').onclick = $('toMenu').onclick = () => {
 };
 
 show('title');
+
