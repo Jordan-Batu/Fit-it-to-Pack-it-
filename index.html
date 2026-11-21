@@ -25,7 +25,10 @@
       <h2>Select level</h2>
       <p class="sub">Earn 2 ★ or more to unlock the next bag.</p>
       <div id="levelList" class="level-list"></div>
-      <button class="btn alt back" type="button" data-go="title">← Back</button>
+    <div class="row center-row">
+        <button class="btn alt back" type="button" data-go="title">← Back</button>
+        <button class="btn alt back" type="button" data-go="themes">Themes</button>
+      </div>
     </section>
 
     <section id="s-game" class="screen game-screen">
@@ -85,6 +88,20 @@
       around that can reduce your points.</p>
       <button class="btn alt back" type="button" data-go="title">← Back</button>
     </section>
+
+
+    <section id="s-themes" class="screen">
+      <h2>Themes</h2>
+      <p class="select-theme">Select a Theme</p>
+      <div class="menu">
+        <button class="btn alt" type="button">Original</button>
+        <button class="btn alt" type="button">School</button>
+        <button class="btn alt" type="button">Vacation</button>
+        <button class="btn alt" type="button">Sports</button>
+      </div>
+      <button class="btn alt back" type="button" data-go="levels">← Back</button>
+    </section>
+
 
     <div id="result" role="dialog" aria-modal="true" aria-labelledby="rTitle" aria-describedby="rText">
       <div class="box">

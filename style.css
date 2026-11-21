@@ -654,3 +654,7 @@ h2 {
     radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
     radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
 }
+
+body[data-s='themes'] #s-themes {
+  display: flex;
+}
