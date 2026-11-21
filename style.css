@@ -60,6 +60,7 @@ body {
 
 body[data-s='title'] #s-title,
 body[data-s='game'] #s-game,
+body[data-s='themes'] #s-themes,
 body[data-s='levels'] #s-levels,
 body[data-s='lb'] #s-lb,
 body[data-s='about'] #s-about {
@@ -654,3 +655,17 @@ h2 {
     radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
     radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
 }
+
+body[data-s='themes'] #s-themes {
+background: rgb(1, 38, 41);
+}
+
+
+
+
+
+
+
+
+
+

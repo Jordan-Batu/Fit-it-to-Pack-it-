@@ -84,7 +84,7 @@ let pendingScore = null;
 const LB_KEY = 'fitnpack:leaderboard';
 const NAME_KEY = 'fitnpack:lastName';
 const LB_MAX = 10;
-const PROGRESS_KEY = 'fitnpack:progress';
+let PROGRESS_KEY = 'fitnpack:progress';
 
 function loadScores() {
   try {
@@ -107,7 +107,7 @@ const byScore = (a, b) => b.score - a.score || a.date - b.date;
 function trimScores(list) {
   const kept = [];
 
-  LEVELS.forEach((_, index) => {
+  ALL_LEVELS.forEach((_, index) => {
     kept.push(...list.filter((e) => e.level === index + 1).sort(byScore).slice(0, LB_MAX));
   });
 
@@ -175,12 +175,12 @@ function renderLeaderboard(highlightId) {
   const tabs = $('lbTabs');
   tabs.textContent = '';
 
-  LEVELS.forEach((level, index) => {
+  ALL_LEVELS.forEach((level, index) => {
     const tab = document.createElement('button');
     tab.type = 'button';
     tab.className = 'btn alt small tab';
     tab.dataset.level = index + 1;
-    tab.textContent = `${index + 1}. ${level.n}`;
+    tab.textContent = level.label || `${index + 1}. ${level.n}`;
     tab.setAttribute('aria-pressed', String(index + 1 === lbLevel));
     tabs.appendChild(tab);
   });
@@ -326,7 +326,7 @@ function renderLevels() {
     card.disabled = locked;
 
     const art = document.createElement('img');
-    art.src = `images/bags/${level.bag}.svg`;
+    art.src = `images/${level.bag}.svg`;
     art.alt = '';
 
     const title = document.createElement('b');
@@ -712,7 +712,7 @@ $('done').onclick = () => {
   $('again').className = canNext ? 'btn alt small' : 'btn play';
 
   $('rText').textContent = `Items +${baseScore}, time bonus +${bonus}${junkCount ? `, junk −${penalty}` : ''}. Total ${score} points.${note}`;
-  pendingScore = { score, stars, level: levelIndex + 1 };
+  pendingScore = { score, stars, level: levelIndex + 1 + LEVEL_OFFSET };
   $('pname').value = getLastName();
   $('pname').disabled = false;
   $('saveScore').disabled = false;
@@ -766,7 +766,7 @@ document.addEventListener('click', (event) => {
 $('play').onclick = () => show('levels');
 $('toLb').onclick = () => {
   $('result').classList.remove('show');
-  lbLevel = levelIndex + 1;
+  lbLevel = levelIndex + 1 + LEVEL_OFFSET;
   show('lb');
 };
 $('gameBack').onclick = $('toLevels').onclick = () => {
@@ -823,5 +823,142 @@ if ($('musicBtn')) {
   };
 }
 
-show('title');
+/* =====================================================================
+    Sports theme items, levels and the Themes buttons
+   ===================================================================== */
 
+const SPORTS_ITEMS = {
+  ball: { n: 'Ball', pts: 25, s: [[1, 1], [1, 1]] },
+  tape: { n: 'Athletic tape', pts: 10, s: [[1]] },
+  'energy-drink': { n: 'Energy drink', pts: 20, s: [[1], [1], [1]] },
+  jersey: { n: 'Jersey', pts: 20, s: [[1, 1], [1, 1]] },
+  towel: { n: 'Towel', pts: 15, s: [[1], [1]] },
+  'beer-can': { n: 'Beer can', pts: 0, junk: 1, s: [[1], [1]] },
+  chips: { n: 'Chips', pts: 0, junk: 1, s: [[1], [1]] },
+};
+
+Object.assign(ITEMS, SPORTS_ITEMS);
+
+const SPORTS_LEVELS = [
+  {
+    n: 'Gym Bag',
+    bag: 'clutch',
+    w: 4,
+    h: 3,
+    time: 45,
+    penalty: 25,
+    req: ['ball', 'tape', 'towel'],
+    extra: ['energy-drink'],
+    junk: ['beer-can'],
+  },
+  {
+    n: 'Duffel',
+    bag: 'handbag',
+    w: 5,
+    h: 4,
+    time: 50,
+    penalty: 30,
+    req: ['ball', 'shoes', 'jersey', 'tape'],
+    extra: ['towel'],
+    junk: ['beer-can', 'chips'],
+  },
+  {
+    n: 'Locker Pack',
+    bag: 'backpack',
+    w: 6,
+    h: 5,
+    time: 55,
+    penalty: 40,
+    req: ['ball', 'shoes', 'tape', 'energy-drink', 'jersey', 'towel'],
+    extra: [],
+    junk: ['beer-can', 'chips'],
+  },
+  {
+    n: 'Team Trunk',
+    bag: 'suitcase',
+    w: 7,
+    h: 6,
+    time: 60,
+    penalty: 50,
+    req: ['ball', 'shoes', 'tape', 'energy-drink', 'jersey', 'towel'],
+    extra: [],
+    junk: ['beer-can', 'chips'],
+  },
+];
+
+const ORIGINAL_LEVELS = [...LEVELS];
+
+// One shared leaderboard: Original levels are 1-4, Sports levels are saved as 5-8.
+let LEVEL_OFFSET = 0;
+
+const ALL_LEVELS = [
+  ...ORIGINAL_LEVELS.map((level, index) => ({ ...level, label: `${index + 1}. ${level.n}` })),
+  ...SPORTS_LEVELS.map((level, index) => ({ ...level, label: `Sports ${index + 1}. ${level.n}` })),
+];
+
+// Each theme has its own levels, progress (stars/unlocks) and leaderboard.
+const THEMES = {
+  original: {
+    levels: ORIGINAL_LEVELS,
+    progressKey: 'fitnpack:progress',
+    offset: 0,
+  },
+  sports: {
+    levels: SPORTS_LEVELS,
+    progressKey: 'fitnpack:progress:sports',
+    offset: ORIGINAL_LEVELS.length,
+  },
+};
+
+function applyTheme(name) {
+  const theme = THEMES[name] || THEMES.original;
+
+  LEVELS.splice(0, LEVELS.length, ...theme.levels);
+  PROGRESS_KEY = theme.progressKey;
+  LEVEL_OFFSET = theme.offset;
+
+  levelIndex = 0;
+  lbLevel = 1 + LEVEL_OFFSET;
+  LEVEL = LEVELS[0];
+  document.body.dataset.theme = name;
+}
+
+document.addEventListener('click', (event) => {
+  
+  const button = event.target.closest('button[data-theme]');
+
+  if (button) {
+    applyTheme(button.dataset.theme);
+    show('levels');
+  }
+});
+
+document.addEventListener(
+  'click',
+  (event) => {
+    if (event.target.closest('[data-go="title"]')) {
+      applyTheme('original');
+    }
+  },
+  true,
+);
+
+// One-time: move scores saved earlier under the separate Sports key into the main leaderboard.
+(() => {
+  try {
+    const old = JSON.parse(localStorage.getItem('fitnpack:leaderboard:sports'));
+
+    if (Array.isArray(old)) {
+      const moved = old
+        .filter((e) => e && typeof e.score === 'number' && typeof e.name === 'string')
+        .map((e) => ({ ...e, level: (Number(e.level) || 1) + ORIGINAL_LEVELS.length }));
+
+      storeScores(trimScores([...loadScores(), ...moved]));
+      localStorage.removeItem('fitnpack:leaderboard:sports');
+    }
+  } catch (error) {
+  
+  }
+})();
+
+show('title');
