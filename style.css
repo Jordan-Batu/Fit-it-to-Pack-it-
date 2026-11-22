@@ -1502,3 +1502,285 @@ body[data-theme='school'] .belt-track {
     animation: none !important;
   }
 }
+
+
+/* Fit-N-Pack · vacation.css
+   Link this in index.html AFTER style.css:
+     <link rel="stylesheet" href="vacation.css">
+   It contains the whole Vacation look (sunny background + boarding-pass result box).
+   If you pasted vacation-theme.css into style.css earlier, you can delete that block. */
+
+/* ---------- colors + sunny beach background ---------- */
+body[data-theme='vacation'] {
+  --title: #ffffff;
+  --bg: #aee7f7;
+  --ink: #0b3a4a;
+  --card: #fff8e6;
+  --line: #1b6b80;
+  --tag: #ffd84d;
+  --tag-ink: #4a3300;
+  --good: #1fae7a;
+  background:
+    radial-gradient(circle 70px at 86% 13%, #fffbd0 0 55%, rgba(255, 226, 110, 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 130px 34px at 18% 16%, rgba(255, 255, 255, 0.85) 0 60%, transparent 62%),
+    radial-gradient(ellipse 90px 26px at 30% 20%, rgba(255, 255, 255, 0.7) 0 60%, transparent 62%),
+    radial-gradient(ellipse 150px 38px at 62% 9%, rgba(255, 255, 255, 0.75) 0 60%, transparent 62%),
+    linear-gradient(180deg, #4cc3f0 0%, #98e1f6 38%, #7fe3e0 68%, #f6e3ad 90%, #ecc98a 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* waves along the bottom */
+body[data-theme='vacation']::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 110px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30px 0, transparent 26px, rgba(255, 255, 255, 0.55) 27px 30px, transparent 31px) 0 38px / 60px 60px repeat-x,
+    radial-gradient(circle at 30px 0, transparent 26px, #5fd0dc 27px) 0 22px / 60px 60px repeat-x,
+    linear-gradient(180deg, transparent 0, rgba(46, 170, 200, 0.35) 100%);
+  opacity: 0.9;
+}
+
+body[data-theme='vacation'] .btn.alt { background: rgba(255, 255, 255, 0.55); }
+body[data-theme='vacation'] .item { background: rgba(255, 255, 255, 0.7); }
+
+body[data-theme='vacation'] .panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 236, 190, 0.5)), var(--card);
+  color: var(--ink);
+  border-color: #1fae7a;
+}
+
+body[data-theme='vacation'] .sub,
+body[data-theme='vacation'] .select-theme {
+  opacity: 1;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+body[data-theme='vacation'] .timer { color: #fff; background: rgba(11, 58, 74, 0.55); }
+body[data-theme='vacation'] .lv-stars,
+body[data-theme='vacation'] .lb-stars { color: #f0a400; }
+body[data-theme='vacation'] .lb-rank { color: #e0573a; }
+body[data-theme='vacation'] .fx-float { opacity: 0.28; filter: none; }
+
+body[data-theme='vacation'] #belt::after {
+  height: 26px;
+  background: repeating-linear-gradient(90deg, #f0d08a 0 40px, #e8c37a 40px 80px);
+  border-top: 3px solid #d9ab5c;
+  animation: none;
+}
+body[data-theme='vacation'] .belt-track { padding-bottom: 26px; }
+
+.confetti.vac {
+  width: 34px;
+  height: auto;
+  border-radius: 0;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+}
+
+/* ---------- result popup: a boarding pass ---------- */
+body[data-theme='vacation'] #result {
+  background: rgba(6, 70, 92, 0.5);
+}
+
+body[data-theme='vacation'] #result .box {
+  position: relative;
+  max-width: 370px;
+  padding: 62px 24px 22px;
+  overflow: hidden;
+  color: #0b3a4a;
+  background:
+    radial-gradient(circle at 50% 118%, rgba(79, 209, 217, 0.35) 0 38%, transparent 39%),
+    linear-gradient(180deg, #fffdf6, #fff0cf);
+  border: 3px solid #0b7f99;
+  border-radius: 20px;
+  box-shadow: 0 22px 50px rgba(0, 40, 60, 0.45), 6px 6px 0 #0b7f99;
+}
+
+/* airline header strip */
+body[data-theme='vacation'] #result .box::before {
+  content: '✈  BOARDING PASS  ✈';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(90deg, #0b9cc4, #3fd0d6, #0b9cc4);
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+}
+
+/* round "sun" stamp */
+body[data-theme='vacation'] #result .box::after {
+  content: '☀ HAVE\A A GREAT\A TRIP';
+  white-space: pre;
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #e0573a;
+  border: 3px double #e0573a;
+  border-radius: 50%;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: 0.55rem;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+  transform: rotate(12deg);
+}
+
+body[data-theme='vacation'] #result .box h2 {
+  color: #0b7f99;
+  font-size: 1.7rem;
+}
+
+body[data-theme='vacation'] #stars {
+  color: #f0a400;
+  text-shadow: 0 0 14px rgba(255, 200, 60, 0.6);
+}
+
+body[data-theme='vacation'] #result .box p { color: #0b3a4a; }
+
+/* tear-off line above the buttons */
+body[data-theme='vacation'] #result .row {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 3px dashed rgba(11, 127, 153, 0.45);
+}
+
+body[data-theme='vacation'] #result .btn.alt {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #0b7f99;
+  color: #0b3a4a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme='vacation']::after { animation: none; }
+}
+
+/*  vacation bags */
+
+/* Level 1 Beach Pouch  */
+.bagwrap[data-bag='beachpouch'] {
+  --bag: #2aa9b3;
+  --slot: #43c0c9;
+  --slot-line: #6dd3da;
+  margin-top: 14px;
+  border-radius: 34px 34px 22px 22px;
+}
+
+.bagwrap[data-bag='beachpouch']::before {
+  top: 12px;
+  left: 22px;
+  right: 22px;
+  width: auto;
+  height: 0;
+  border: 0;
+  border-top: 4px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 0;
+  transform: none;
+  display: none;
+}
+
+/* Level 2 Beach Tote  */
+.bagwrap[data-bag='beachtote'] {
+  --bag: #d9a84a;
+  --slot: #e9c06f;
+  --slot-line: #f4d594;
+  margin-top: 30px;
+  border-radius: 6px 6px 26px 26px;
+}
+
+.bagwrap[data-bag='beachtote']::before {
+  top: -28px;
+  width: 56%;
+  height: 38px;
+  border-color: #b98a30;
+}
+
+/* Level 3 Day Backpack  */
+.bagwrap[data-bag='daybackpack'] {
+  --bag: #e0573a;
+  --slot: #f07a5a;
+  --slot-line: #ff9a80;
+  margin-top: 22px;
+  border-radius: 50px 50px 18px 18px;
+}
+
+.bagwrap[data-bag='daybackpack']::before {
+  top: -16px;
+  width: 22%;
+  height: 24px;
+}
+
+/* Level 4 Carry-On  */
+.bagwrap[data-bag='carryon'] {
+  --bag: #2f6fb0;
+  --slot: #4a8bcb;
+  --slot-line: #6aa3dd;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='carryon']::before {
+  top: -24px;
+  width: 24%;
+  height: 26px;
+  border-radius: 5px 5px 0 0;
+}
+
+.bagwrap[data-bag='carryon']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+
+/* Level 5 Grand Getaway  */
+.bagwrap[data-bag='getaway'] {
+  --bag: #c98a1c;
+  --slot: #f0b43c;
+  --slot-line: #ffc95e;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='getaway']::before {
+  top: -22px;
+  width: 26%;
+  height: 24px;
+  border-radius: 6px 6px 0 0;
+  border-color: #7a4a0a;
+}
+
+.bagwrap[data-bag='getaway']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}

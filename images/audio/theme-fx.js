@@ -20,11 +20,14 @@
       hero: 'ball',
     },
     vacation: {
-      float: ['sunglasses', 'umbrella', 'camera', 'passport', 'shoes', 'bottle', 'tablet', 'headphones'],
-      belt: ['suitcase', 'duffel', 'tote', 'sling', 'sunglasses', 'umbrella'],
-      hero: 'suitcase',
+      float: ['sunscreen', 'flipflops', 'snorkel', 'sunglasses', 'towel', 'umbrella', 'camera', 'passport', 'bottle'],
+      belt: ['beachpouch', 'beachtote', 'daybackpack', 'carryon', 'getaway', 'sunscreen', 'flipflops', 'snorkel'],
+      hero: 'getaway',
     },
   };
+
+  // pictures used as confetti in the Vacation theme
+  const VACATION_CONFETTI = ['sunscreen', 'flipflops', 'snorkel', 'sunglasses', 'towel', 'umbrella', 'camera', 'passport', 'bottle'];
 
   const picture = (name) => {
     const img = new Image();
@@ -85,22 +88,26 @@
     });
   }
 
-  // confetti when you earn 2+ stars (pencils and stars in the School theme)
+  // confetti when you earn 2+ stars (pencils and stars in School, vacation items in Vacation)
   const COLORS = ['#d3ff6c', '#f2c230', '#ff7a59', '#5ad1ff', '#ff6fb5'];
   const EMOJI = ['✏️', '⭐', '📏', '📚', '🖍️'];
 
   function confetti() {
-    const school = body.dataset.theme === 'school';
+    const theme = body.dataset.theme;
+    const school = theme === 'school';
+    const vacation = theme === 'vacation';
 
     for (let i = 0; i < 46; i += 1) {
-      const bit = document.createElement('i');
-      bit.className = 'confetti';
+      const bit = vacation ? picture(VACATION_CONFETTI[i % VACATION_CONFETTI.length]) : document.createElement('i');
+      bit.className = vacation ? 'confetti vac' : 'confetti';
       bit.style.left = `${Math.random() * 100}%`;
       bit.style.setProperty('--x', `${Math.random() * 160 - 80}px`);
       bit.style.setProperty('--rot', `${Math.random() * 720 - 360}deg`);
       bit.style.setProperty('--t', `${1.6 + Math.random() * 1.4}s`);
 
-      if (school) {
+      if (vacation) {
+        bit.style.width = `${26 + Math.random() * 20}px`;
+      } else if (school) {
         bit.classList.add('emo');
         bit.textContent = EMOJI[i % EMOJI.length];
       } else {
