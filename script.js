@@ -1391,6 +1391,79 @@ const SCHOOL_LEVELS = [
     junk: ['paperball', 'gum', 'slip', 'wrapper'],
   },
 ];
+const VACATION_ITEMS = {
+  // new items (need images/<key>.svg)
+  sunscreen: { n: 'Sunscreen', pts: 15, s: [[1], [1]] },
+  flipflops: { n: 'Flip-flops', pts: 20, s: [[1, 1], [1, 1]] },
+  snorkel: { n: 'Snorkel', pts: 20, s: [[1, 0], [1, 0], [1, 1]] },
+  // new junk
+  meltedicecream: { n: 'Melted ice cream', pts: 0, junk: 1, s: [[1], [1]] },
+  seashell: { n: 'Seashell', pts: 0, junk: 1, s: [[1]] },
+  seaweed: { n: 'Tangled seaweed', pts: 0, junk: 1, s: [[1, 1]] },
+  coconut: { n: 'Empty coconut', pts: 0, junk: 1, s: [[1]] },
+};
+
+Object.assign(ITEMS, VACATION_ITEMS);
+
+const VACATION_LEVELS = [
+  {
+    n: 'Beach Pouch',
+    bag: 'beachpouch',
+    w: 4,
+    h: 3,
+    time: 45,
+    penalty: 25,
+    req: ['phone', 'wallet', 'sunglasses', 'keys'],
+    extra: ['sunscreen', 'earbuds'],
+    junk: ['seashell'],
+  },
+  {
+    n: 'Beach Tote',
+    bag: 'beachtote',
+    w: 5,
+    h: 4,
+    time: 50,
+    penalty: 30,
+    req: ['phone', 'wallet', 'sunglasses', 'towel', 'keys'],
+    extra: ['sunscreen', 'flipflops', 'earbuds'],
+    junk: ['seashell', 'meltedicecream'],
+  },
+  {
+    n: 'Day Backpack',
+    bag: 'daybackpack',
+    w: 6,
+    h: 5,
+    time: 55,
+    penalty: 40,
+    req: ['phone', 'wallet', 'sunglasses', 'towel', 'passport', 'keys', 'umbrella'],
+    extra: ['camera', 'snorkel', 'flipflops'],
+    junk: ['seashell', 'meltedicecream', 'coconut'],
+  },
+  {
+    n: 'Carry-On',
+    bag: 'carryon',
+    w: 7,
+    h: 6,
+    time: 60,
+    penalty: 50,
+    blocked: [[0, 6], [5, 0]],
+    req: ['phone', 'wallet', 'passport', 'sunglasses', 'towel', 'umbrella', 'camera', 'shoes', 'keys'],
+    extra: ['snorkel', 'flipflops', 'bottle'],
+    junk: ['seashell', 'meltedicecream', 'coconut', 'seaweed'],
+  },
+  {
+    n: 'Grand Getaway',
+    bag: 'getaway',
+    w: 8,
+    h: 6,
+    time: 85,
+    penalty: 60,
+    blocked: [[2, 3], [2, 4], [3, 3], [3, 4]],
+    req: ['tablet', 'umbrella', 'camera', 'shoes', 'towel', 'wallet', 'phone', 'passport', 'sunglasses', 'keys'],
+    extra: ['flipflops', 'snorkel', 'sunscreen'],
+    junk: ['seashell', 'meltedicecream', 'coconut', 'seaweed'],
+  },
+];
 
 const ORIGINAL_LEVELS = [...LEVELS];
 
@@ -1411,12 +1484,18 @@ const THEMES = {
     levels: SPORTS_LEVELS,
     progressKey: 'fitnpack:progress:sports',
   },
+   vacation: {
+    label: 'Vacation',
+    levels: VACATION_LEVELS,
+    progressKey: 'fitnpack:progress:vacation',
+  },
 };
 
 const THEME_MUSIC = {
   original: 'images/audio/intro.mp3',
   school: 'images/audio/school.mp3',
   sports: 'images/audio/intro.mp3',
+  vacation: 'images/audio/vacation.mp3',
 };
 let bgmSrc = THEME_MUSIC.original;
 
