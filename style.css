@@ -1,0 +1,1886 @@
+:root {
+  --bg: #e6ece8;
+  --ink: #1d2b26;
+  --tag: #f2c230;
+  --tag-ink: #2a2200;
+  --card: #f7faf8;
+  --line: #c3d0c9;
+  --bag: #7a3b5c;
+  --slot: #8f4e70;
+  --slot-line: #a56283;
+  --good: #3aa675;
+  --bad: #e4001e;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #15201c;
+    --ink: #e3ece7;
+    --card: #1e2d26;
+    --line: #33493f;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #15201c;
+  --ink: #e3ece7;
+  --card: #1e2d26;
+  --line: #33493f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.screen {
+  display: none;
+  min-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  gap: 8px;
+}
+
+body[data-s='title'] #s-title,
+body[data-s='game'] #s-game,
+body[data-s='themes'] #s-themes,
+body[data-s='levels'] #s-levels,
+body[data-s='lb'] #s-lb,
+body[data-s='howto'] #s-howto,
+body[data-s='about'] #s-about {
+  display: flex;
+}
+
+.big {
+  margin: 0;
+  font-size: clamp(3.4rem, 16vw, 6.5rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #d3ff6c;
+}
+
+.sub {
+  max-width: 34ch;
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+.overview {
+  max-width: 34ch;
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.4;
+  border: 1px solid rgb(204, 255, 64);
+  border-radius: 8px;
+  padding: 20px;
+  background:rgb(12, 19, 15);
+  color: rgb(255, 255, 255) ;
+}
+
+.mechanics {
+ max-width: 34ch;
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.4;
+  border: 1px solid rgb(204, 255, 64);
+  border-radius: 8px;
+  padding: 20px;
+  background:rgb(12, 19, 15);
+  color: rgb(255, 255, 255) ;
+}
+
+.about-header {
+color: #d3ff6c;
+}
+
+.mechanics-header {
+color: #d3ff6c;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(260px, 100%);
+  margin-top: 18px;
+}
+
+.btn {
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn.alt {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--line);
+}
+
+.btn.play {
+  background: var(--tag);
+  color: var(--tag-ink);
+  font-weight: 800;
+}
+
+.btn.small {
+  padding: 10px 14px;
+  font-size: 1rem;
+}
+
+.btn:focus-visible,
+.item:focus-visible,
+.cell:focus-visible {
+  outline: 3px solid var(--tag);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.back {
+  width: auto;
+  margin-top: 16px;
+  padding: 10px 18px;
+  font-size: 1rem;
+}
+
+.screen.game-screen {
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 920px;
+  margin-bottom: 14px;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  max-width: 920px;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bagwrap {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 14px;
+  padding: 18px;
+  background: var(--bag);
+  border-radius: 26px 26px 16px 16px;
+}
+
+.bagwrap::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  width: 46%;
+  height: 26px;
+  border: 6px solid var(--bag);
+  border-bottom: none;
+  border-radius: 40px 40px 0 0;
+  transform: translateX(-50%);
+}
+
+.tagline {
+  position: absolute;
+  top: -14px;
+  right: -6px;
+  padding: 4px 10px;
+  background: var(--tag);
+  color: var(--tag-ink);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  transform: rotate(4deg);
+}
+
+#grid {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  --cs: min(64px, calc((100vw - 90px) / var(--w)));
+  grid-template-columns: repeat(var(--w), var(--cs));
+  grid-auto-rows: var(--cs);
+}
+
+.cell {
+  background: var(--slot);
+  border: 1px solid var(--slot-line);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.cell.ok {
+  outline: 3px solid var(--good);
+  outline-offset: -3px;
+}
+
+.cell.no {
+  outline: 3px solid var(--bad);
+  outline-offset: -3px;
+}
+
+.cell.shake {
+  animation: shake 0.25s;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-3px);
+  }
+
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell.shake {
+    animation: none;
+  }
+}
+
+.art {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+
+.art.ghost {
+  opacity: 0.55;
+}
+
+.art img,
+.mini img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  overflow: visible;
+}
+
+.panel {
+  padding: 14px;
+  background: rgb(35, 50, 51);
+  border: 1px solid var(--good);
+  border-radius: 14px; 
+}
+
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+#tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 60px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg);
+  color: inherit;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.item[aria-pressed='true'] {
+  border-color: var(--tag);
+  box-shadow: 0 0 0 2px var(--tag);
+}
+
+.mini {
+  position: relative;
+}
+
+.nm {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.req {
+  padding: 0 5px;
+  background: var(--tag);
+  color: var(--tag-ink);
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.center-row {
+  justify-content: center;
+}
+
+#msg {
+  min-height: 1.4em;
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+.timer {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #d3ff6c;
+}
+
+.timer.low {
+  color: var(--bad);
+}
+
+.prog {
+  height: 10px;
+  margin: 6px 0 4px;
+  background: var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.prog b {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--good);
+  transition: width 0.2s;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+#result {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 20, 15, 0.6);
+}
+
+#result.show {
+  display: grid;
+}
+
+#result .box {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 18px;
+  text-align: center;
+}
+
+#stars {
+  color: var(--tag);
+  font-size: 2.4rem;
+  letter-spacing: 6px;
+}
+
+@media (max-width: 720px) {
+  .game {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .side {
+    width: 100%;
+  }
+}
+
+
+.savebox {
+  margin-top: 14px;
+}
+
+.savebox label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.savebox input {
+  width: 9em;
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+}
+
+.savebox input:focus-visible {
+  outline: 3px solid var(--tag);
+  outline-offset: 2px;
+}
+
+.lb-list {
+  width: min(420px, 100%);
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 2em 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: left;
+}
+
+.lb-row.me {
+  border-color: var(--tag);
+  box-shadow: 0 0 0 2px var(--tag);
+}
+
+.lb-rank {
+  font-weight: 800;
+  color: var(--tag);
+}
+
+.lb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.lb-stars {
+  color: var(--tag);
+  letter-spacing: 2px;
+}
+
+.lb-score {
+  min-width: 3em;
+  text-align: right;
+  font-weight: 800;
+}
+
+/* hidden attribute must win over .btn display rules */
+[hidden] {
+  display: none !important;
+}
+
+/* ---- level select ---- */
+.level-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  width: min(460px, 100%);
+  margin-top: 12px;
+}
+
+.level-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.level-card:hover:not(:disabled) {
+  border-color: var(--tag);
+}
+
+.level-card:focus-visible {
+  outline: 3px solid var(--tag);
+  outline-offset: 2px;
+}
+
+.level-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.level-card img {
+  width: 84px;
+  height: 84px;
+}
+
+.lv-stars {
+  color: var(--tag);
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+/* ---- leaderboard tabs ---- */
+.lb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.lb-tabs .tab[aria-pressed='true'] {
+  background: var(--tag);
+  border-color: var(--tag);
+  color: var(--tag-ink);
+}
+
+/* ---- bag variants (one per level) ---- */
+.bagwrap[data-bag='handbag'] {
+  --bag: #a8512b;
+  --slot: #bf6a43;
+  --slot-line: #d4835c;
+  margin-top: 28px;
+  border-radius: 30px 30px 20px 20px;
+}
+
+.bagwrap[data-bag='handbag']::before {
+  top: -24px;
+  width: 62%;
+  height: 36px;
+}
+
+.bagwrap[data-bag='backpack'] {
+  --bag: #2f6f5e;
+  --slot: #418a77;
+  --slot-line: #58a38f;
+  margin-top: 20px;
+  border-radius: 46px 46px 18px 18px;
+}
+
+.bagwrap[data-bag='backpack']::before {
+  top: -16px;
+  width: 24%;
+  height: 24px;
+}
+
+.bagwrap[data-bag='suitcase'] {
+  --bag: #3b4a8c;
+  --slot: #4d5fa8;
+  --slot-line: #6376be;
+  margin-top: 22px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='suitcase']::before {
+  top: -14px;
+  width: 32%;
+  height: 16px;
+  border-radius: 6px 6px 0 0;
+}
+
+.bagwrap[data-bag='suitcase']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+
+body[data-s='themes'] #s-themes {
+background: rgb(1, 38, 41);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---- nickname popup ---- */
+#nameModal {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 20, 15, 0.6);
+}
+
+#nameModal.show {
+  display: grid;
+}
+
+#nameModal .box {
+  width: 100%;
+  max-width: 340px;
+  padding: 24px;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 18px;
+  text-align: center;
+}
+
+#nameModal h2 {
+  margin: 0 0 6px;
+}
+
+#nameModal .savebox input {
+  width: 100%;
+  text-align: center;
+}
+
+.nameerr {
+  min-height: 1.2em;
+  margin: 6px 0 0;
+  color: var(--bad);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rtotal {
+  margin: 8px 0 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* leaderboard rows now show: rank, name, levels done, stars, theme total */
+.lb-row {
+  grid-template-columns: 2em 1fr auto auto auto;
+}
+
+.lb-lvls {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ---- blocked (sewn-shut) bag cells ---- */
+.cell.blocked {
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.45) 0 6px, rgba(0, 0, 0, 0.3) 6px 12px);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+/* ---- new bags (levels 5-7) ---- */
+.bagwrap[data-bag='tote'] {
+  --bag: #a9863f;
+  --slot: #bf9d52;
+  --slot-line: #d3b46e;
+  margin-top: 26px;
+  border-radius: 10px 10px 24px 24px;
+}
+
+.bagwrap[data-bag='tote']::before {
+  top: -24px;
+  width: 54%;
+  height: 34px;
+}
+
+.bagwrap[data-bag='sling'] {
+  --bag: #2c5a6b;
+  --slot: #3b7287;
+  --slot-line: #5190a5;
+  margin-top: 20px;
+  border-radius: 22px 22px 40px 40px;
+}
+
+.bagwrap[data-bag='sling']::before {
+  top: -16px;
+  width: 20%;
+  height: 22px;
+}
+
+.bagwrap[data-bag='duffel'] {
+  --bag: #8a2d2d;
+  --slot: #a34242;
+  --slot-line: #bd5a5a;
+  margin-top: 24px;
+  border-radius: 60px 60px 24px 24px;
+}
+
+.bagwrap[data-bag='duffel']::before {
+  top: -22px;
+  width: 44%;
+  height: 30px;
+}
+
+
+/* ---- school bags ---- */
+.bagwrap[data-bag='pencilcase'] {
+  --bag: #2e7d32;
+  --slot: #43a047;
+  --slot-line: #66bb6a;
+  margin-top: 14px;
+  border-radius: 40px;
+}
+
+.bagwrap[data-bag='pencilcase']::before {
+  top: 44%;
+  left: 14px;
+  right: 14px;
+  width: auto;
+  height: 0;
+  border: 0;
+  border-top: 4px dashed rgba(0, 0, 0, 0.35);
+  border-radius: 0;
+  transform: none;
+  display: none;
+}
+
+.bagwrap[data-bag='satchel'] {
+  --bag: #7a4a24;
+  --slot: #976038;
+  --slot-line: #b27a4e;
+  margin-top: 26px;
+  border-radius: 14px 14px 26px 26px;
+}
+
+.bagwrap[data-bag='satchel']::before {
+  top: -22px;
+  width: 40%;
+  height: 32px;
+}
+
+.bagwrap[data-bag='locker'] {
+  --bag: #52667d;
+  --slot: #657c96;
+  --slot-line: #7f97b1;
+  margin-top: 12px;
+  border-radius: 6px;
+  border: 4px solid #34495e;
+}
+
+.bagwrap[data-bag='locker']::before {
+  display: none;
+}
+
+.bagwrap[data-bag='trolley'] {
+  --bag: #5b3fa0;
+  --slot: #7253bb;
+  --slot-line: #8a6ed0;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='trolley']::before {
+  top: -22px;
+  width: 22%;
+  height: 24px;
+  border-radius: 4px 4px 0 0;
+}
+
+.bagwrap[data-bag='trolley']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+
+
+/* ---- drag & drop ---- */
+.item,
+#grid {
+  touch-action: none;
+}
+
+.item {
+  cursor: grab;
+}
+
+.cell.occ {
+  cursor: grab;
+}
+
+.item img,
+.art img,
+.dragghost img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.item.ghosted {
+  opacity: 0.35;
+}
+
+.dragghost {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+}
+
+.dragghost img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+body.dragging,
+body.dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+
+/* Fit-N-Pack · theme.css (loads after style.css) */
+
+/* ============ ORIGINAL (also base for Sports / Vacation) ============ */
+body {
+  --title: #d3ff6c;
+  --glow1: rgba(211, 255, 108, 0.13);
+  --glow2: rgba(255, 122, 89, 0.12);
+  --bg: #0b1a1c;
+  --ink: #e8f3ee;
+  --card: #13282a;
+  --line: #2c4a4a;
+  background:
+    radial-gradient(900px 520px at 12% -8%, var(--glow1), transparent 60%),
+    radial-gradient(800px 520px at 100% 105%, var(--glow2), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--bg);
+  background-attachment: fixed;
+}
+
+body[data-theme='sports'] {
+  --title: #ffb15c;
+  --glow1: rgba(255, 138, 61, 0.2);
+  --glow2: rgba(90, 209, 255, 0.12);
+  --bg: #171410;
+  --card: #26201a;
+  --line: #4d4033;
+}
+
+body[data-theme='vacation'] {
+  --title: #7fe7ff;
+  --glow1: rgba(255, 214, 102, 0.2);
+  --glow2: rgba(90, 209, 255, 0.2);
+  --bg: #08202b;
+  --card: #0f3040;
+  --line: #245268;
+}
+
+body[data-s='themes'] #s-themes {
+  background: transparent;
+}
+
+.screen {
+  position: relative;
+  z-index: 1;
+}
+
+#s-title,
+#s-themes {
+  padding-bottom: 120px;
+}
+
+#decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fx-float {
+  position: absolute;
+  opacity: 0.11;
+  filter: grayscale(0.2);
+  animation: drift var(--d, 9s) ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translateY(0) rotate(var(--r)); }
+  to { transform: translateY(-38px) rotate(calc(var(--r) + 28deg)); }
+}
+
+/* title */
+.hero {
+  width: 98px;
+  height: 98px;
+  filter: drop-shadow(0 12px 8px rgba(0, 0, 0, 0.45));
+  animation: hop 1.7s ease-in-out infinite;
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-16px) rotate(5deg); }
+}
+
+.big {
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+  color: var(--title);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 34px color-mix(in srgb, var(--title) 40%, transparent);
+}
+
+.big span {
+  display: inline-block;
+  animation: wave 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+@keyframes wave {
+  0%, 55%, 100% { transform: translateY(0) rotate(0); }
+  28% { transform: translateY(-9px) rotate(-3deg); }
+}
+
+h2,
+.timer {
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+}
+
+.timer {
+  padding: 4px 16px;
+  color: var(--title);
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+}
+
+.timer.low {
+  color: var(--bad);
+  animation: tick 0.7s ease-in-out infinite;
+}
+
+@keyframes tick {
+  50% { transform: scale(1.12); }
+}
+
+/* buttons */
+.btn {
+  border-radius: 14px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px) rotate(-0.8deg);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.btn.alt {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn.alt:hover:not(:disabled) {
+  border-color: var(--title);
+}
+
+.btn.play {
+  background: linear-gradient(180deg, #ffd84d, #f2c230);
+  box-shadow: 0 5px 0 #a87d00, 0 0 24px rgba(242, 194, 48, 0.25);
+}
+
+#s-title .btn.play {
+  animation: glow 2.2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  50% { box-shadow: 0 5px 0 #a87d00, 0 0 36px rgba(242, 194, 48, 0.55); }
+}
+
+#s-themes .btn[data-theme] {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+
+#s-themes .btn[data-theme] img {
+  width: 42px;
+  height: 42px;
+}
+
+/* levels */
+.level-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--card), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s;
+}
+
+.level-card:hover:not(:disabled) {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.level-card .nm {
+  width: 100%;
+  padding-top: 6px;
+  border-top: 2px dashed var(--line);
+}
+
+.level-card:hover:not(:disabled) img {
+  animation: hop 0.9s ease-in-out infinite;
+}
+
+.level-card:disabled img {
+  filter: grayscale(1);
+}
+
+/* the bag */
+.bagwrap {
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), inset 0 -10px 18px rgba(0, 0, 0, 0.25);
+  outline: 2px dashed rgba(255, 255, 255, 0.35);
+  outline-offset: -8px;
+}
+
+.cell {
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+  transition: filter 0.1s;
+}
+
+.cell:hover {
+  filter: brightness(1.14);
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2)), var(--card);
+  border: 2px solid var(--good);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+}
+
+.item {
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s;
+}
+
+.item:hover {
+  transform: translateY(-3px) rotate(-1.5deg);
+}
+
+.req {
+  transform: rotate(-4deg);
+  letter-spacing: 0.04em;
+}
+
+.prog b {
+  background: repeating-linear-gradient(45deg, #5be09a 0 10px, #3aa675 10px 20px);
+  background-size: 28px 28px;
+  animation: stripes 1s linear infinite;
+}
+
+@keyframes stripes {
+  to { background-position: 28px 0; }
+}
+
+/* result popup + confetti */
+#result {
+  backdrop-filter: blur(4px);
+}
+
+#result.show .box {
+  border: 3px solid var(--tag);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes pop {
+  from { transform: scale(0.6) rotate(-4deg); opacity: 0; }
+}
+
+#stars {
+  text-shadow: 0 0 18px rgba(242, 194, 48, 0.6);
+}
+
+.confetti {
+  position: fixed;
+  top: -24px;
+  z-index: 30;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: fall var(--t) cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+
+.confetti.emo {
+  width: auto;
+  height: auto;
+  font-size: 24px;
+  line-height: 1;
+}
+
+@keyframes fall {
+  to { transform: translate(var(--x), 108vh) rotate(var(--rot)); }
+}
+
+/* conveyor belt (title + themes screens) */
+#belt {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 96px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body[data-s='title'] #belt,
+body[data-s='themes'] #belt {
+  display: block;
+}
+
+.belt-track {
+  display: flex;
+  align-items: flex-end;
+  width: max-content;
+  padding-bottom: 22px;
+  animation: belt 28s linear infinite;
+}
+
+.belt-track img {
+  height: 58px;
+  width: auto;
+  margin-right: 64px;
+  filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes belt {
+  to { transform: translateX(-50%); }
+}
+
+#belt::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22px;
+  background: repeating-linear-gradient(90deg, #1a2a2b 0 22px, #2a4143 22px 25px);
+  border-top: 3px solid #3e5a5c;
+  animation: rollers 1s linear infinite;
+}
+
+@keyframes rollers {
+  to { background-position: -25px 0; }
+}
+
+/* ============ SCHOOL: notebook paper + teacher's pen ============ */
+body[data-theme='school'] {
+  --title: #2a4d9b;
+  --bg: #fbf6e6;
+  --ink: #24324a;
+  --card: #fffdf4;
+  --line: #24324a;
+  --tag: #ffd84d;
+  --tag-ink: #3a2c00;
+  --good: #2f9e63;
+  --bad: #d6322f;
+  font-family: 'Patrick Hand', 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 1.08rem;
+  background:
+    radial-gradient(circle 9px at 26px 50%, #d3cbb2 0 8px, transparent 9px) 0 0 / 60px 260px repeat-y,
+    linear-gradient(90deg, transparent 0 62px, rgba(220, 60, 60, 0.6) 62px 64px, transparent 64px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(86, 140, 210, 0.35) 31px 32px),
+    #fbf6e6;
+  background-attachment: fixed;
+}
+
+body[data-theme='school'] .fx-float {
+  opacity: 0.2;
+}
+
+body[data-theme='school'] h2,
+body[data-theme='school'] .timer {
+  font-family: 'Caveat Brush', 'Patrick Hand', cursive;
+  letter-spacing: 0.02em;
+}
+
+body[data-theme='school'] h2 {
+  font-size: 2rem;
+}
+
+body[data-theme='school'] .panel h2 {
+  font-size: 1.5rem;
+}
+
+body[data-theme='school'] .big {
+  display: inline-block;
+  padding: 0 0.12em;
+  font-family: 'Caveat Brush', 'Patrick Hand', cursive;
+  letter-spacing: 0.01em;
+  color: var(--title);
+  text-shadow: none;
+  background: linear-gradient(transparent 58%, #ffe45c 58%, #ffe45c 92%, transparent 92%);
+  transform: rotate(-2deg);
+}
+
+body[data-theme='school'] .hero {
+  filter: drop-shadow(4px 6px 0 rgba(36, 50, 74, 0.25));
+}
+
+body[data-theme='school'] .sub {
+  opacity: 0.9;
+  font-size: 1.2rem;
+}
+
+body[data-theme='school'] .btn {
+  background: #fff7b8;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px 12px 8px 14px / 12px 6px 14px 8px;
+  box-shadow: 3px 4px 0 var(--ink);
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+body[data-theme='school'] .btn.alt {
+  background: var(--card);
+  border: 2px solid var(--ink);
+}
+
+body[data-theme='school'] .btn.play {
+  background: #ffd84d;
+  box-shadow: 3px 4px 0 var(--ink);
+  animation: none;
+}
+
+body[data-theme='school'] .btn:active:not(:disabled) {
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+body[data-theme='school'] .menu .btn:nth-child(odd) {
+  transform: rotate(-1.2deg);
+}
+
+body[data-theme='school'] .menu .btn:nth-child(even) {
+  transform: rotate(1deg);
+}
+
+body[data-theme='school'] .menu .btn:hover:not(:disabled) {
+  transform: rotate(0) translateY(-2px);
+}
+
+body[data-theme='school'] .timer {
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--ink);
+  font-size: 1.5rem;
+}
+
+body[data-theme='school'] .timer.low {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+body[data-theme='school'] .level-card {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-top: 10px solid #ff7a7a;
+  border-radius: 6px;
+  box-shadow: 3px 4px 0 var(--ink);
+}
+
+body[data-theme='school'] .level-card .nm {
+  border-top-color: rgba(86, 140, 210, 0.7);
+}
+
+body[data-theme='school'] .lv-stars,
+body[data-theme='school'] .lb-stars {
+  color: #d99100;
+}
+
+body[data-theme='school'] .lb-rank {
+  color: var(--bad);
+}
+
+body[data-theme='school'] .lb-row {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+body[data-theme='school'] .bagwrap {
+  box-shadow: 6px 8px 0 rgba(36, 50, 74, 0.35);
+  outline-color: rgba(255, 255, 255, 0.6);
+}
+
+body[data-theme='school'] .panel {
+  background: #fff3a3;
+  color: #3a3000;
+  border: none;
+  border-radius: 2px 2px 16px 2px;
+  box-shadow: 5px 7px 0 rgba(36, 50, 74, 0.2);
+  transform: rotate(0.6deg);
+}
+
+body[data-theme='school'] .item {
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 2px 3px 0 var(--ink);
+}
+
+body[data-theme='school'] .prog {
+  background: rgba(36, 50, 74, 0.2);
+  border: 2px solid var(--ink);
+}
+
+body[data-theme='school'] .overview,
+body[data-theme='school'] .mechanics {
+  max-width: 44ch;
+  opacity: 1;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 3px 4px 0 var(--ink);
+  font-size: 1.15rem;
+}
+
+body[data-theme='school'] .about-header,
+body[data-theme='school'] .mechanics-header {
+  color: var(--bad);
+}
+
+body[data-theme='school'] #result {
+  background: rgba(36, 50, 74, 0.45);
+}
+
+body[data-theme='school'] #result .box,
+body[data-theme='school'] #nameModal .box {
+  background:
+    linear-gradient(90deg, transparent 0 34px, rgba(220, 60, 60, 0.55) 34px 36px, transparent 36px),
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(86, 140, 210, 0.35) 27px 28px),
+    var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+}
+
+body[data-theme='school'] #result.show .box {
+  position: relative;
+  box-shadow: 6px 8px 0 rgba(36, 50, 74, 0.4);
+}
+
+body[data-theme='school'] #result .box h2 {
+  color: var(--bad);
+  transform: rotate(-2deg);
+}
+
+body[data-theme='school'] #result .box::after {
+  content: 'CHECKED ✓';
+  position: absolute;
+  top: 10px;
+  right: -8px;
+  padding: 2px 8px;
+  color: var(--bad);
+  border: 3px solid var(--bad);
+  border-radius: 6px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 1.05rem;
+  opacity: 0.8;
+  transform: rotate(10deg);
+}
+
+body[data-theme='school'] #stars {
+  color: #e0a100;
+}
+
+body[data-theme='school'] .savebox input {
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+
+/* ruler instead of conveyor belt */
+body[data-theme='school'] #belt::after {
+  height: 26px;
+  background:
+    repeating-linear-gradient(90deg, #6b5410 0 2px, transparent 2px 14px) 0 0 / 100% 11px no-repeat,
+    repeating-linear-gradient(90deg, #6b5410 0 2px, transparent 2px 70px) 0 0 / 100% 18px no-repeat,
+    #f3d77a;
+  border-top: 3px solid #6b5410;
+  animation: none;
+}
+
+body[data-theme='school'] .belt-track {
+  padding-bottom: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-float,
+  .belt-track,
+  .hero,
+  .big span,
+  #s-title .btn.play,
+  .timer.low,
+  .prog b,
+  #belt::after,
+  #result.show .box {
+    animation: none !important;
+  }
+}
+
+
+/* Fit-N-Pack · vacation.css
+   Link this in index.html AFTER style.css:
+     <link rel="stylesheet" href="vacation.css">
+   It contains the whole Vacation look (sunny background + boarding-pass result box).
+   If you pasted vacation-theme.css into style.css earlier, you can delete that block. */
+
+/* ---------- colors + sunny beach background ---------- */
+body[data-theme='vacation'] {
+  --title: #ffffff;
+  --bg: #aee7f7;
+  --ink: #0b3a4a;
+  --card: #fff8e6;
+  --line: #1b6b80;
+  --tag: #ffd84d;
+  --tag-ink: #4a3300;
+  --good: #1fae7a;
+  background:
+    radial-gradient(circle 70px at 86% 13%, #fffbd0 0 55%, rgba(255, 226, 110, 0.55) 70%, transparent 100%),
+    radial-gradient(ellipse 130px 34px at 18% 16%, rgba(255, 255, 255, 0.85) 0 60%, transparent 62%),
+    radial-gradient(ellipse 90px 26px at 30% 20%, rgba(255, 255, 255, 0.7) 0 60%, transparent 62%),
+    radial-gradient(ellipse 150px 38px at 62% 9%, rgba(255, 255, 255, 0.75) 0 60%, transparent 62%),
+    linear-gradient(180deg, #4cc3f0 0%, #98e1f6 38%, #7fe3e0 68%, #f6e3ad 90%, #ecc98a 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* waves along the bottom */
+body[data-theme='vacation']::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 110px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 30px 0, transparent 26px, rgba(255, 255, 255, 0.55) 27px 30px, transparent 31px) 0 38px / 60px 60px repeat-x,
+    radial-gradient(circle at 30px 0, transparent 26px, #5fd0dc 27px) 0 22px / 60px 60px repeat-x,
+    linear-gradient(180deg, transparent 0, rgba(46, 170, 200, 0.35) 100%);
+  opacity: 0.9;
+}
+
+body[data-theme='vacation'] .btn.alt { background: rgba(255, 255, 255, 0.55); }
+body[data-theme='vacation'] .item { background: rgba(255, 255, 255, 0.7); }
+
+body[data-theme='vacation'] .panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 236, 190, 0.5)), var(--card);
+  color: var(--ink);
+  border-color: #1fae7a;
+}
+
+body[data-theme='vacation'] .sub,
+body[data-theme='vacation'] .select-theme {
+  opacity: 1;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+body[data-theme='vacation'] .timer { color: #fff; background: rgba(11, 58, 74, 0.55); }
+body[data-theme='vacation'] .lv-stars,
+body[data-theme='vacation'] .lb-stars { color: #f0a400; }
+body[data-theme='vacation'] .lb-rank { color: #e0573a; }
+body[data-theme='vacation'] .fx-float { opacity: 0.28; filter: none; }
+
+body[data-theme='vacation'] #belt::after {
+  height: 26px;
+  background: repeating-linear-gradient(90deg, #f0d08a 0 40px, #e8c37a 40px 80px);
+  border-top: 3px solid #d9ab5c;
+  animation: none;
+}
+body[data-theme='vacation'] .belt-track { padding-bottom: 26px; }
+
+.confetti.vac {
+  width: 34px;
+  height: auto;
+  border-radius: 0;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+}
+
+/* ---------- result popup: a boarding pass ---------- */
+body[data-theme='vacation'] #result {
+  background: rgba(6, 70, 92, 0.5);
+}
+
+body[data-theme='vacation'] #result .box {
+  position: relative;
+  max-width: 370px;
+  padding: 62px 24px 22px;
+  overflow: hidden;
+  color: #0b3a4a;
+  background:
+    radial-gradient(circle at 50% 118%, rgba(79, 209, 217, 0.35) 0 38%, transparent 39%),
+    linear-gradient(180deg, #fffdf6, #fff0cf);
+  border: 3px solid #0b7f99;
+  border-radius: 20px;
+  box-shadow: 0 22px 50px rgba(0, 40, 60, 0.45), 6px 6px 0 #0b7f99;
+}
+
+/* airline header strip */
+body[data-theme='vacation'] #result .box::before {
+  content: '✈  BOARDING PASS  ✈';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(90deg, #0b9cc4, #3fd0d6, #0b9cc4);
+  font-family: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+}
+
+/* round "sun" stamp */
+body[data-theme='vacation'] #result .box::after {
+  content: '☀ HAVE\A A GREAT\A TRIP';
+  white-space: pre;
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #e0573a;
+  border: 3px double #e0573a;
+  border-radius: 50%;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: 0.55rem;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+  transform: rotate(12deg);
+}
+
+body[data-theme='vacation'] #result .box h2 {
+  color: #0b7f99;
+  font-size: 1.7rem;
+}
+
+body[data-theme='vacation'] #stars {
+  color: #f0a400;
+  text-shadow: 0 0 14px rgba(255, 200, 60, 0.6);
+}
+
+body[data-theme='vacation'] #result .box p { color: #0b3a4a; }
+
+/* tear-off line above the buttons */
+body[data-theme='vacation'] #result .row {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 3px dashed rgba(11, 127, 153, 0.45);
+}
+
+body[data-theme='vacation'] #result .btn.alt {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #0b7f99;
+  color: #0b3a4a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-theme='vacation']::after { animation: none; }
+}
+
+/*  vacation bags */
+
+/* Level 1 Beach Pouch  */
+.bagwrap[data-bag='beachpouch'] {
+  --bag: #2aa9b3;
+  --slot: #43c0c9;
+  --slot-line: #6dd3da;
+  margin-top: 14px;
+  border-radius: 34px 34px 22px 22px;
+}
+
+.bagwrap[data-bag='beachpouch']::before {
+  top: 12px;
+  left: 22px;
+  right: 22px;
+  width: auto;
+  height: 0;
+  border: 0;
+  border-top: 4px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 0;
+  transform: none;
+  display: none;
+}
+
+/* Level 2 Beach Tote  */
+.bagwrap[data-bag='beachtote'] {
+  --bag: #d9a84a;
+  --slot: #e9c06f;
+  --slot-line: #f4d594;
+  margin-top: 30px;
+  border-radius: 6px 6px 26px 26px;
+}
+
+.bagwrap[data-bag='beachtote']::before {
+  top: -28px;
+  width: 56%;
+  height: 38px;
+  border-color: #b98a30;
+}
+
+/* Level 3 Day Backpack  */
+.bagwrap[data-bag='daybackpack'] {
+  --bag: #e0573a;
+  --slot: #f07a5a;
+  --slot-line: #ff9a80;
+  margin-top: 22px;
+  border-radius: 50px 50px 18px 18px;
+}
+
+.bagwrap[data-bag='daybackpack']::before {
+  top: -16px;
+  width: 22%;
+  height: 24px;
+}
+
+/* Level 4 Carry-On  */
+.bagwrap[data-bag='carryon'] {
+  --bag: #2f6fb0;
+  --slot: #4a8bcb;
+  --slot-line: #6aa3dd;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='carryon']::before {
+  top: -24px;
+  width: 24%;
+  height: 26px;
+  border-radius: 5px 5px 0 0;
+}
+
+.bagwrap[data-bag='carryon']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+
+/* Level 5 Grand Getaway  */
+.bagwrap[data-bag='getaway'] {
+  --bag: #c98a1c;
+  --slot: #f0b43c;
+  --slot-line: #ffc95e;
+  margin-top: 26px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+.bagwrap[data-bag='getaway']::before {
+  top: -22px;
+  width: 26%;
+  height: 24px;
+  border-radius: 6px 6px 0 0;
+  border-color: #7a4a0a;
+}
+
+.bagwrap[data-bag='getaway']::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -14px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
+    radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
+}
+/* ---- how to play ---- */
+#s-howto {
+  justify-content: flex-start;
+  padding-bottom: 48px;
+}
+
+.howto-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: min(920px, 100%);
+  margin: 12px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.howto-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgb(204, 255, 64);
+  border-radius: 8px;
+  background: rgb(12, 19, 15);
+  color: rgb(255, 255, 255);
+  text-align: left;
+}
+
+.howto-step img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.howto-step h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #d3ff6c;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.howto-step p {
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.howto-num {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--tag);
+  color: var(--tag-ink);
+  font-weight: 800;
+}
+
+.howto-num.howto-warn {
+  background: var(--bad);
+  color: #fff;
+}
+
+.howto-note {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  border-color: var(--bad);
+}
+
+.howto-note img {
+  width: min(46%, 380px);
+  flex: none;
+}
+
+.howto-note div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 680px) {
+  .howto-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .howto-note {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .howto-note img {
+    width: 100%;
+  }
+}
