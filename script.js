@@ -1,3 +1,6 @@
+/* ------------------------------- ITEM DATA ------------------------------ */
+// Each item has a display name, points, and a shape made from 1/0 grid cells.
+// A 1 is a filled square; a 0 is an empty corner or hole in the shape.
 const ITEMS = {
   phone: { n: 'Phone', pts: 25, s: [[1], [1]] },
   lipstick: { n: 'Lipstick', pts: 10, s: [[1], [1]] },
@@ -22,9 +25,9 @@ const ITEMS = {
   wrapper: { n: 'Candy wrapper', pts: 0, junk: 1, s: [[1]] },
   sock: { n: 'Lone sock', pts: 0, junk: 1, s: [[1, 0], [1, 1]] },
 };
-/*sd*/
 const UNLOCK_STARS = 2;
 
+// Original theme: each object describes one bag size, timer, requirements, and junk.
 const LEVELS = [
   {
     n: 'Clutch',
@@ -108,6 +111,8 @@ const LEVELS = [
   },
 ];
 
+/* ------------------------------- GAME STATE ----------------------------- */
+// These variables remember the currently selected level, theme, items, and timer.
 let levelIndex = 0;
 let LEVEL = LEVELS[levelIndex];
 let lbTheme = 'original';
@@ -121,13 +126,14 @@ let timerId = null;
 let timeLeft = 0;
 let lastHighlight = null;
 
+// Local Storage keys keep progress, names, and scores after the page is refreshed.
 const BOARD_KEY = 'fitnpack:board:v2';
 const NAME_KEY = 'fitnpack:lastName';
 const LB_MAX = 10;
 let PROGRESS_KEY = 'fitnpack:progress';
 let playerName = '';
 
-/* ---------- progress (stars / unlocked levels) ---------- */
+/* ---------- Saved progress: stars and unlocked levels ---------- */
 function loadProgress() {
   const fresh = { unlocked: 1, stars: LEVELS.map(() => 0) };
 
@@ -157,7 +163,7 @@ function saveProgress(progress) {
   }
 }
 
-/* ---------- nickname ---------- */
+/* ---------- Player nickname ---------- */
 function getLastName() {
   if (playerName) {
     return playerName;
@@ -180,7 +186,7 @@ function setLastName(name) {
   }
 }
 
-/* ---------- leaderboard: one score per player per THEME ----------
+/* ---------- Leaderboard: one score per player per theme ----------
    board = { themeKey: { 'nickname-lowercase': { name, date, levels: { '0': { score, stars }, ... } } } }
    A theme score is the sum of the player's best score on each level of that theme. */
 function loadBoard() {
@@ -366,6 +372,7 @@ function confirmName() {
 
   const next = afterName;
   setLastName(name);
+  // Set up the first screen and the saved nickname when the page finishes loading.
   updateNameBtn();
   closeName();
 
@@ -374,8 +381,10 @@ function confirmName() {
   }
 }
 
+// Short helper used throughout the file to find an element by its HTML id.
 const $ = (id) => document.getElementById(id);
 
+/* ---------- Sound effects ---------- */
 let audioCtx = null;
 
 function playTone(freq, duration, type = 'sine', volume = 0.12) {
@@ -412,6 +421,8 @@ const sfx = {
   },
 };
 
+/* ---------- Item shape and size helpers ---------- */
+// Turning a matrix 90 degrees is used to rotate an item.
 const rotate = (matrix) =>
   matrix[0].map((_, index) => matrix.map((row) => row[index]).reverse());
 
@@ -438,12 +449,15 @@ function svg(item, sizeFn) {
   return `<img src="images/${item.key}.svg" alt="" draggable="false" style="width:${sizeFn(width)};height:${sizeFn(height)};transform:translate(-50%,-50%) rotate(${item.rot * 90}deg)">`;
 }
 
+// Builds the HTML picture used by a packed item or a placement preview.
 function boardArt(item, position, cssClass) {
   const matrix = shape(item);
 
   return `<div class="art ${cssClass || ''}" style="left:calc((var(--cs) + 3px) * ${position.c});top:calc((var(--cs) + 3px) * ${position.r});width:${boxSize(matrix[0].length)};height:${boxSize(matrix.length)}">${svg(item, boxSize)}</div>`;
 }
 
+/* ---------- Screen and level rendering ---------- */
+// Creates the level-card buttons for the selected theme.
 function renderLevels() {
   $('levelsTitle').textContent = `Select level · ${THEMES[currentTheme].label}`;
   const progress = loadProgress();
@@ -480,6 +494,7 @@ function renderLevels() {
   });
 }
 
+// Starts or restarts a level with a fresh set of shuffled items.
 function start() {
   let id = 0;
   LEVEL = LEVELS[levelIndex];
@@ -517,6 +532,8 @@ function start() {
   render();
 }
 
+/* ---------- Bag placement rules ---------- */
+// Returns a map of every bag cell already occupied by a packed item.
 function occupiedCells(skipId) {
   const cells = {};
 
@@ -546,6 +563,7 @@ function originPoint(item, row, column) {
 
 const isBlocked = (row, col) => (LEVEL.blocked || []).some(([r, c]) => r === row && c === col);
 
+// Checks whether an item fits inside the bag, inside blocked cells, and not on another item.
 function fits(item, origin) {
   const occupied = occupiedCells(item.id);
 
@@ -563,6 +581,7 @@ function fits(item, origin) {
   );
 }
 
+// Recreates the grid and item tray from the current game state.
 function render() {
   const grid = $('grid');
   grid.style.setProperty('--w', LEVEL.w);
@@ -627,6 +646,7 @@ function render() {
   $('done').disabled = requiredPacked < requiredItems.length || isDone;
 }
 
+// Places the selected item when the player uses the click-to-place controls.
 function placeAt(row, column) {
   const item = items.find((entry) => entry.id === selectedId);
 
@@ -708,6 +728,7 @@ $('grid').addEventListener('mouseleave', () => {
   }
 });
 
+/* ---------- Tray selection ---------- */
 $('tray').addEventListener('click', (event) => {
   const button = event.target.closest('.item');
 
@@ -993,6 +1014,8 @@ document.addEventListener('click', (event) => {
   }
 }, true);
 
+/* ---------- Rotation, timer, and result handling ---------- */
+// Turns the selected item and rebuilds its preview.
 function rotateSelected() {
   const item = items.find((entry) => entry.id === selectedId);
 
@@ -1030,6 +1053,7 @@ document.addEventListener('contextmenu', (event) => {
 $('reset').onclick = start;
 $('again').onclick = start;
 
+// Displays the remaining time and changes the timer style near the end.
 function updateTimer() {
   const timer = $('timer');
   timer.textContent = `⏱ ${formatTime(Math.max(0, timeLeft))}`;
@@ -1074,6 +1098,7 @@ function timeUp() {
   $('result').classList.add('show');
 }
 
+// Finishes the level, calculates points and stars, unlocks progress, and saves the score.
 $('done').onclick = () => {
   stopTimer();
   sfx.win();
@@ -1156,6 +1181,8 @@ $('lbClear').onclick = () => {
   }
 };
 
+/* ---------- Navigation and theme switching ---------- */
+// Changes the visible screen by updating the data-s value on the page body.
 function show(nextScreen) {
   document.body.dataset.s = nextScreen;
 
@@ -1223,6 +1250,7 @@ $('lbTabs').addEventListener('click', (event) => {
   }
 });
 
+/* ---------- Background music ---------- */
 const bgm = new Audio('images/audio/intro.mp3');
 bgm.loop = true;
 bgm.volume = 0.3;
@@ -1250,7 +1278,8 @@ if ($('musicBtn')) {
 }
 
 /* =====================================================================
-    Sports theme items, levels and the Themes buttons
+    THEME DATA
+    Sports, School, and Vacation have separate items and level lists.
    ===================================================================== */
 
 const SPORTS_ITEMS = {
@@ -1491,6 +1520,7 @@ const THEMES = {
   },
 };
 
+// Every theme can use a matching background-music file.
 const THEME_MUSIC = {
   original: 'images/audio/intro.mp3',
   school: 'images/audio/school.mp3',
@@ -1515,6 +1545,7 @@ function setThemeMusic(key) {
   }
 }
 
+// Applies a theme by changing levels, progress storage, music, and body styles.
 function applyTheme(name) {
   const key = THEMES[name] ? name : 'original';
   const theme = THEMES[key];

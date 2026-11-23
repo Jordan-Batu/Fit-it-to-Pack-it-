@@ -1,5 +1,9 @@
-/* Fit-N-Pack · theme-fx.js — visuals only, no game logic */
+/* Fit-N-Pack · theme-fx.js
+   This file only changes decorations and visual effects.
+   It does not calculate scores, move game items, or save progress.
+*/
 (() => {
+  // Short helpers and a map of images for every theme.
   const body = document.body;
   const $ = (id) => document.getElementById(id);
 

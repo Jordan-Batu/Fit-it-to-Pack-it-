@@ -1,3 +1,5 @@
+/* ============================== COLOR VALUES ============================== */
+/* Default theme variables: most colors and background values use these names. */
 :root {
   --bg: #e6ece8;
   --ink: #1d2b26;
@@ -31,6 +33,7 @@
   --line: #33493f;
 }
 
+/* Reset box sizing so width and padding are easier to calculate. */
 * {
   box-sizing: border-box;
 }
@@ -47,6 +50,8 @@ body {
   font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+/* ================================ SCREENS ================================ */
+/* Only the screen selected by body[data-s] is shown. */
 .screen {
   display: none;
   min-height: 100%;
@@ -116,6 +121,7 @@ color: #d3ff6c;
 color: #d3ff6c;
 }
 
+/* ------------------------------ MENU BUTTONS ----------------------------- */
 .menu {
   display: flex;
   flex-direction: column;
@@ -177,6 +183,7 @@ h2 {
   font-size: 1rem;
 }
 
+/* ------------------------------ GAME SCREEN ------------------------------ */
 .screen.game-screen {
   justify-content: flex-start;
   align-items: center;
@@ -383,6 +390,7 @@ h2 {
   font-weight: 600;
 }
 
+/* ------------------------- TIMER AND PROGRESS -------------------------- */
 .timer {
   font-size: 1.4rem;
   font-weight: 800;
@@ -416,6 +424,7 @@ h2 {
   opacity: 0.75;
 }
 
+/* ---------------------------- RESULT POPUP ----------------------------- */
 #result {
   position: fixed;
   inset: 0;
@@ -484,6 +493,7 @@ h2 {
   outline-offset: 2px;
 }
 
+/* ------------------------------ LEADERBOARD ----------------------------- */
 .lb-list {
   width: min(420px, 100%);
   margin: 12px 0 0;
@@ -537,7 +547,7 @@ h2 {
   display: none !important;
 }
 
-/* ---- level select ---- */
+/* -------------------------- LEVEL SELECTION ---------------------------- */
 .level-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -585,7 +595,7 @@ h2 {
   font-weight: 800;
 }
 
-/* ---- leaderboard tabs ---- */
+/* ----------------------------- THEME TABS ------------------------------ */
 .lb-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -600,7 +610,8 @@ h2 {
   color: var(--tag-ink);
 }
 
-/* ---- bag variants (one per level) ---- */
+/* ------------------------------- BAG SHAPES ---------------------------- */
+/* Bag-specific classes change the bag color and handle shape for each level. */
 .bagwrap[data-bag='handbag'] {
   --bag: #a8512b;
   --slot: #bf6a43;
@@ -672,7 +683,7 @@ background: rgb(1, 38, 41);
 
 
 
-/* ---- nickname popup ---- */
+/* ---------------------------- NICKNAME POPUP ---------------------------- */
 #nameModal {
   position: fixed;
   inset: 0;
@@ -731,14 +742,14 @@ background: rgb(1, 38, 41);
   white-space: nowrap;
 }
 
-/* ---- blocked (sewn-shut) bag cells ---- */
+/* -------------------------- BLOCKED BAG CELLS --------------------------- */
 .cell.blocked {
   background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.45) 0 6px, rgba(0, 0, 0, 0.3) 6px 12px);
   border-style: dashed;
   cursor: not-allowed;
 }
 
-/* ---- new bags (levels 5-7) ---- */
+/* ------------------------- EXTRA ORIGINAL BAGS ------------------------- */
 .bagwrap[data-bag='tote'] {
   --bag: #a9863f;
   --slot: #bf9d52;
@@ -860,7 +871,7 @@ background: rgb(1, 38, 41);
 }
 
 
-/* ---- drag & drop ---- */
+/* -------------------------- DRAG-AND-DROP VIEW -------------------------- */
 .item,
 #grid {
   touch-action: none;
@@ -906,7 +917,7 @@ body.dragging * {
 }
 
 
-/* Fit-N-Pack · theme.css (loads after style.css) */
+/* ============================== THEME STYLES ============================= */
 
 /* ============ ORIGINAL (also base for Sports / Vacation) ============ */
 body {
@@ -1246,7 +1257,7 @@ body[data-s='themes'] #belt {
   to { background-position: -25px 0; }
 }
 
-/* ============ SCHOOL: notebook paper + teacher's pen ============ */
+/* ======================= SCHOOL THEME ======================= */
 body[data-theme='school'] {
   --title: #2a4d9b;
   --bg: #fbf6e6;
@@ -1511,7 +1522,8 @@ body[data-theme='school'] .belt-track {
    It contains the whole Vacation look (sunny background + boarding-pass result box).
    If you pasted vacation-theme.css into style.css earlier, you can delete that block. */
 
-/* ---------- colors + sunny beach background ---------- */
+/* ======================= VACATION THEME ======================= */
+/* Colors and a sunny beach background. */
 body[data-theme='vacation'] {
   --title: #ffffff;
   --bg: #aee7f7;
@@ -1785,7 +1797,7 @@ body[data-theme='vacation'] #result .btn.alt {
     radial-gradient(circle at 10px 9px, #1d2b26 8px, transparent 9px),
     radial-gradient(circle at calc(100% - 10px) 9px, #1d2b26 8px, transparent 9px);
 }
-/* ---- how to play ---- */
+/* ======================= HOW-TO PLAY LAYOUT ======================= */
 #s-howto {
   justify-content: flex-start;
   padding-bottom: 48px;
@@ -1886,7 +1898,7 @@ body[data-theme='vacation'] #result .btn.alt {
 }
 
 
-/* Fit-N-Pack - ito yung css ng sports theme natin */
+/* ======================= SPORTS THEME ======================= */
 
 body[data-theme='sports'] {
   --title: #ffd600;
