@@ -1494,7 +1494,7 @@ const THEMES = {
 const THEME_MUSIC = {
   original: 'images/audio/intro.mp3',
   school: 'images/audio/school.mp3',
-  sports: 'images/audio/intro.mp3',
+  sports: 'images/audio/sports.mp3',
   vacation: 'images/audio/vacation.mp3',
 };
 let bgmSrc = THEME_MUSIC.original;

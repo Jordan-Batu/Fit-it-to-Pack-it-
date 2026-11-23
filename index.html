@@ -18,6 +18,7 @@
 
       <div class="menu">
         <button class="btn play" id="play" type="button">Play</button>
+        <button class="btn alt" type="button" data-go="howto">How to play</button>
         <button class="btn alt" type="button" data-go="lb">Leaderboard</button>
         <button class="btn alt" type="button" data-go="about">About</button>
         <button class="btn alt small" id="nameBtn" type="button">👤 Set nickname</button>
@@ -82,6 +83,44 @@
         <button class="btn alt back" type="button" data-go="title">← Back</button>
         <button class="btn alt back" id="lbClear" type="button">Clear scores</button>
       </div>
+    </section>
+
+    <section id="s-howto" class="screen">
+      <h2 class="about-header">How to play</h2>
+      <p class="sub howto-intro">Pack the bag in four easy steps.</p>
+
+      <ol class="howto-steps">
+        <li class="howto-step">
+          <img src="images/howto-step1.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step1.svg'" alt="Step 1: click or drag an item from the items list">
+          <h3><span class="howto-num">1</span>Click/drag the item</h3>
+          <p>Hold the mouse button on an item in your list, or simply click it, to pick it up.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step2.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step2.svg'" alt="Step 2: move the item towards the bag and drop it on empty cells">
+          <h3><span class="howto-num">2</span>Move it towards the bag</h3>
+          <p>Drag it over the bag and let go on empty cells. Drag it out again to take it back.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step3.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step3.svg'" alt="Step 3: rotate the item with the R key or mouse wheel so it fits the gap">
+          <h3><span class="howto-num">3</span>Rotate based on the perspective</h3>
+          <p>Press R or scroll the mouse wheel to turn the item until it fits the space.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step4.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step4.svg'" alt="Step 4: pack the remaining items before the timer runs out">
+          <h3><span class="howto-num">4</span>Do the others before the time runs out</h3>
+          <p>Pack every MUST item, then press Finish packing before the timer hits zero.</p>
+        </li>
+        <li class="howto-step howto-note">
+          <img src="images/howto-note.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-note.svg'" alt="Note: junk items such as trash, receipts, wrappers and socks cost you points">
+          <div>
+            <h3><span class="howto-num howto-warn">!</span>Note</h3>
+            <p><b>Make sure to avoid putting unnecessary things in the bag!</b></p>
+            <p>Junk items like trash, receipts and wrappers take up space and reduce your points.</p>
+          </div>
+        </li>
+      </ol>
+
+      <button class="btn alt back" type="button" data-go="title">← Back</button>
     </section>
 
     <section id="s-about" class="screen">
