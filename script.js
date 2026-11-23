@@ -14,6 +14,9 @@ const ITEMS = {
   headphones: { n: 'Headphones', pts: 25, s: [[1, 1, 1], [1, 0, 1]] },
   laptop: { n: 'Laptop', pts: 40, s: [[1, 1, 1], [1, 1, 1]] },
   shoes: { n: 'Sneakers', pts: 25, s: [[1, 1, 0], [1, 1, 1]] },
+  camera: { n: 'Camera', pts: 35, s: [[1, 1, 1], [0, 1, 0]] },
+  book: { n: 'Book', pts: 30, s: [[1, 1], [1, 1], [1, 1]] },
+  passport: { n: 'Passport', pts: 20, s: [[1]] },
   trash: { n: 'Crumpled trash', pts: 0, junk: 1, s: [[1]] },
   receipt: { n: 'Old receipt', pts: 0, junk: 1, s: [[1], [1]] },
   wrapper: { n: 'Candy wrapper', pts: 0, junk: 1, s: [[1]] },
@@ -67,11 +70,48 @@ const LEVELS = [
     extra: ['headphones', 'bottle', 'charger', 'earbuds'],
     junk: ['trash', 'receipt', 'wrapper', 'sock'],
   },
+  {
+    n: 'Tote Bag',
+    bag: 'tote',
+    w: 6,
+    h: 5,
+    time: 50,
+    penalty: 45,
+    blocked: [[0, 5], [1, 5], [4, 0]],
+    req: ['phone', 'wallet', 'passport', 'book', 'sunglasses', 'keys', 'umbrella', 'cable'],
+    extra: ['powerbank', 'charger', 'earbuds'],
+    junk: ['trash', 'receipt', 'wrapper', 'sock'],
+  },
+  {
+    n: 'Sling Bag',
+    bag: 'sling',
+    w: 5,
+    h: 5,
+    time: 35,
+    penalty: 50,
+    blocked: [[0, 0], [0, 4], [2, 2]],
+    req: ['camera', 'tablet', 'headphones', 'wallet', 'keys', 'earbuds', 'phone'],
+    extra: ['passport', 'charger'],
+    junk: ['sock', 'trash', 'receipt', 'wrapper'],
+  },
+  {
+    n: 'Duffel of Doom',
+    bag: 'duffel',
+    w: 8,
+    h: 6,
+    time: 80,
+    penalty: 60,
+    blocked: [[2, 3], [2, 4], [3, 3], [3, 4]],
+    req: ['laptop', 'shoes', 'tablet', 'umbrella', 'camera', 'headphones', 'wallet', 'phone', 'keys', 'sunglasses'],
+    extra: ['bottle', 'powerbank', 'charger', 'earbuds'],
+    junk: ['sock', 'receipt', 'trash', 'wrapper'],
+  },
 ];
 
 let levelIndex = 0;
 let LEVEL = LEVELS[levelIndex];
-let lbLevel = 1;
+let lbTheme = 'original';
+let currentTheme = 'original';
 
 let items = [];
 let selectedId = null;
@@ -79,41 +119,15 @@ let hoveredCell = null;
 let isDone = false;
 let timerId = null;
 let timeLeft = 0;
-let pendingScore = null;
+let lastHighlight = null;
 
-const LB_KEY = 'fitnpack:leaderboard';
+const BOARD_KEY = 'fitnpack:board:v2';
 const NAME_KEY = 'fitnpack:lastName';
 const LB_MAX = 10;
 let PROGRESS_KEY = 'fitnpack:progress';
+let playerName = '';
 
-function loadScores() {
-  try {
-    const data = JSON.parse(localStorage.getItem(LB_KEY));
-
-    if (Array.isArray(data)) {
-      return data
-        .filter((e) => e && typeof e.score === 'number' && typeof e.name === 'string')
-        .map((e) => ({ ...e, level: Number.isInteger(e.level) && e.level >= 1 ? e.level : 1 }));
-    }
-  } catch (error) {
-    // storage unavailable or corrupted: fall through to empty list
-  }
-
-  return [];
-}
-
-const byScore = (a, b) => b.score - a.score || a.date - b.date;
-
-function trimScores(list) {
-  const kept = [];
-
-  ALL_LEVELS.forEach((_, index) => {
-    kept.push(...list.filter((e) => e.level === index + 1).sort(byScore).slice(0, LB_MAX));
-  });
-
-  return kept;
-}
-
+/* ---------- progress (stars / unlocked levels) ---------- */
 function loadProgress() {
   const fresh = { unlocked: 1, stars: LEVELS.map(() => 0) };
 
@@ -143,16 +157,12 @@ function saveProgress(progress) {
   }
 }
 
-function storeScores(list) {
-  try {
-    localStorage.setItem(LB_KEY, JSON.stringify(list));
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
+/* ---------- nickname ---------- */
 function getLastName() {
+  if (playerName) {
+    return playerName;
+  }
+
   try {
     return localStorage.getItem(NAME_KEY) || '';
   } catch (error) {
@@ -161,39 +171,142 @@ function getLastName() {
 }
 
 function setLastName(name) {
+  playerName = name;
+
   try {
     localStorage.setItem(NAME_KEY, name);
   } catch (error) {
-    // ignore
+    // ignore: the name still lives in memory for this session
   }
 }
 
-function renderLeaderboard(highlightId) {
-  const all = loadScores();
-  const scores = all.filter((e) => e.level === lbLevel).sort(byScore).slice(0, LB_MAX);
+/* ---------- leaderboard: one score per player per THEME ----------
+   board = { themeKey: { 'nickname-lowercase': { name, date, levels: { '0': { score, stars }, ... } } } }
+   A theme score is the sum of the player's best score on each level of that theme. */
+function loadBoard() {
+  try {
+    const data = JSON.parse(localStorage.getItem(BOARD_KEY));
+
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      return data;
+    }
+  } catch (error) {
+    // fall through
+  }
+
+  return migrateOldBoard();
+}
+
+function storeBoard(board) {
+  try {
+    localStorage.setItem(BOARD_KEY, JSON.stringify(board));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Old versions saved one entry per level (Original = 1-4, Sports = 5-8). Fold them into theme totals once.
+function migrateOldBoard() {
+  const board = {};
+
+  try {
+    const old = JSON.parse(localStorage.getItem('fitnpack:leaderboard'));
+
+    if (Array.isArray(old)) {
+      old.forEach((e) => {
+        if (!e || typeof e.score !== 'number' || typeof e.name !== 'string') {
+          return;
+        }
+
+        const level = Math.max(1, Number(e.level) || 1);
+        const theme = level > 4 ? 'sports' : 'original';
+        const index = level > 4 ? level - 5 : level - 1;
+        const key = e.name.trim().toLowerCase();
+
+        board[theme] = board[theme] || {};
+        board[theme][key] = board[theme][key] || { name: e.name, date: e.date || 0, levels: {} };
+
+        const slot = board[theme][key].levels[index];
+
+        if (!slot || e.score > slot.score) {
+          board[theme][key].levels[index] = { score: e.score, stars: e.stars || 0 };
+        }
+      });
+
+      storeBoard(board);
+    }
+  } catch (error) {
+    // nothing to migrate
+  }
+
+  return board;
+}
+
+function themeTotals(entry) {
+  const levels = Object.values((entry && entry.levels) || {});
+
+  return {
+    score: levels.reduce((sum, l) => sum + l.score, 0),
+    stars: levels.reduce((sum, l) => sum + l.stars, 0),
+    done: levels.length,
+  };
+}
+
+function recordScore(theme, name, levelIdx, score, stars) {
+  const board = loadBoard();
+  const key = name.trim().toLowerCase();
+
+  board[theme] = board[theme] || {};
+  board[theme][key] = board[theme][key] || { name, date: Date.now(), levels: {} };
+
+  const entry = board[theme][key];
+  const old = entry.levels[levelIdx];
+
+  entry.name = name;
+  entry.date = Date.now();
+  entry.levels[levelIdx] = {
+    score: old ? Math.max(old.score, score) : score,
+    stars: old ? Math.max(old.stars, stars) : stars,
+  };
+
+  const saved = storeBoard(board);
+
+  return { saved, key, levelBest: entry.levels[levelIdx].score, ...themeTotals(entry) };
+}
+
+const byTotal = (a, b) => b.score - a.score || a.date - b.date;
+
+function renderLeaderboard(highlightKey) {
+  const board = loadBoard();
+  const themeKeys = Object.keys(THEMES);
+  const rows = Object.entries(board[lbTheme] || {})
+    .map(([key, entry]) => ({ key, name: entry.name, date: entry.date, ...themeTotals(entry) }))
+    .sort(byTotal)
+    .slice(0, LB_MAX);
 
   const tabs = $('lbTabs');
   tabs.textContent = '';
 
-  ALL_LEVELS.forEach((level, index) => {
+  themeKeys.forEach((key) => {
     const tab = document.createElement('button');
     tab.type = 'button';
     tab.className = 'btn alt small tab';
-    tab.dataset.level = index + 1;
-    tab.textContent = level.label || `${index + 1}. ${level.n}`;
-    tab.setAttribute('aria-pressed', String(index + 1 === lbLevel));
+    tab.dataset.theme = key;
+    tab.textContent = THEMES[key].label;
+    tab.setAttribute('aria-pressed', String(key === lbTheme));
     tabs.appendChild(tab);
   });
 
-  $('lbEmpty').style.display = scores.length ? 'none' : '';
-  $('lbClear').style.display = all.length ? '' : 'none';
+  $('lbEmpty').style.display = rows.length ? 'none' : '';
+  $('lbClear').style.display = Object.keys(board).length ? '' : 'none';
 
   const list = $('lbList');
   list.textContent = '';
 
-  scores.forEach((entry, index) => {
+  rows.forEach((entry, index) => {
     const li = document.createElement('li');
-    li.className = `lb-row${entry.id === highlightId ? ' me' : ''}`;
+    li.className = `lb-row${entry.key === highlightKey ? ' me' : ''}`;
 
     const rank = document.createElement('span');
     rank.className = 'lb-rank';
@@ -203,43 +316,62 @@ function renderLeaderboard(highlightId) {
     name.className = 'lb-name';
     name.textContent = entry.name;
 
+    const lvls = document.createElement('span');
+    lvls.className = 'lb-lvls';
+    lvls.textContent = `${entry.done}/${THEMES[lbTheme].levels.length} lvls`;
+
     const stars = document.createElement('span');
     stars.className = 'lb-stars';
-    stars.textContent = '★'.repeat(entry.stars || 0);
+    stars.textContent = `★${entry.stars}`;
 
     const pts = document.createElement('span');
     pts.className = 'lb-score';
     pts.textContent = entry.score;
 
-    li.append(rank, name, stars, pts);
+    li.append(rank, name, lvls, stars, pts);
     list.appendChild(li);
   });
 }
 
-function saveCurrentScore() {
-  if (!pendingScore) {
+/* ---------- nickname popup (asked BEFORE playing) ---------- */
+let afterName = null;
+
+function updateNameBtn() {
+  const name = getLastName();
+  $('nameBtn').textContent = name ? `👤 ${name}` : '👤 Set nickname';
+}
+
+function openName(next) {
+  afterName = next || null;
+  $('nameErr').textContent = '';
+  $('pname').value = getLastName();
+  $('nameModal').classList.add('show');
+  $('pname').focus();
+  $('pname').select();
+}
+
+function closeName() {
+  $('nameModal').classList.remove('show');
+  afterName = null;
+}
+
+function confirmName() {
+  const name = $('pname').value.trim().slice(0, 12);
+
+  if (!name) {
+    $('nameErr').textContent = 'Please type a nickname first.';
+    $('pname').focus();
     return;
   }
 
-  const name = $('pname').value.trim().slice(0, 12) || 'Player';
-  const entry = {
-    id: Date.now() + Math.random().toString(36).slice(2, 6),
-    level: pendingScore.level,
-    name,
-    score: pendingScore.score,
-    stars: pendingScore.stars,
-    date: Date.now(),
-  };
-
-  const ok = storeScores(trimScores([...loadScores(), entry]));
-  lbLevel = entry.level;
-
+  const next = afterName;
   setLastName(name);
-  pendingScore = null;
-  $('saveScore').disabled = true;
-  $('pname').disabled = true;
-  $('saveScore').textContent = ok ? 'Saved ✓' : 'Not saved';
-  renderLeaderboard(entry.id);
+  updateNameBtn();
+  closeName();
+
+  if (next) {
+    next();
+  }
 }
 
 const $ = (id) => document.getElementById(id);
@@ -303,7 +435,7 @@ function svg(item, sizeFn) {
   const width = base[0].length;
   const height = base.length;
 
-  return `<img src="images/${item.key}.svg" alt="" style="width:${sizeFn(width)};height:${sizeFn(height)};transform:translate(-50%,-50%) rotate(${item.rot * 90}deg)">`;
+  return `<img src="images/${item.key}.svg" alt="" draggable="false" style="width:${sizeFn(width)};height:${sizeFn(height)};transform:translate(-50%,-50%) rotate(${item.rot * 90}deg)">`;
 }
 
 function boardArt(item, position, cssClass) {
@@ -313,6 +445,7 @@ function boardArt(item, position, cssClass) {
 }
 
 function renderLevels() {
+  $('levelsTitle').textContent = `Select level · ${THEMES[currentTheme].label}`;
   const progress = loadProgress();
   const list = $('levelList');
   list.textContent = '';
@@ -379,9 +512,7 @@ function start() {
   hoveredCell = null;
   isDone = false;
   $('result').classList.remove('show');
-  $('saveBox').hidden = true;
-  pendingScore = null;
-  $('msg').textContent = 'Pick an item, then tap the bag to place it.';
+  $('msg').textContent = 'Drag an item into the bag, or tap it and then tap a cell.';
   show('game');
   render();
 }
@@ -413,6 +544,8 @@ function originPoint(item, row, column) {
   };
 }
 
+const isBlocked = (row, col) => (LEVEL.blocked || []).some(([r, c]) => r === row && c === col);
+
 function fits(item, origin) {
   const occupied = occupiedCells(item.id);
 
@@ -425,7 +558,7 @@ function fits(item, origin) {
       const y = origin.r + rowIndex;
       const x = origin.c + colIndex;
 
-      return y >= 0 && x >= 0 && y < LEVEL.h && x < LEVEL.w && !occupied[`${y},${x}`];
+      return y >= 0 && x >= 0 && y < LEVEL.h && x < LEVEL.w && !isBlocked(y, x) && !occupied[`${y},${x}`];
     }),
   );
 }
@@ -456,10 +589,15 @@ function render() {
   }
 
   let markup = '';
+  const occupiedNow = occupiedCells();
 
   for (let row = 0; row < LEVEL.h; row += 1) {
     for (let col = 0; col < LEVEL.w; col += 1) {
-      let className = 'cell';
+      let className = isBlocked(row, col) ? 'cell blocked' : 'cell';
+
+      if (occupiedNow[`${row},${col}`] !== undefined) {
+        className += ' occ';
+      }
 
       if (previewCells[`${row},${col}`]) {
         className += validPlacement ? ' ok' : ' no';
@@ -477,7 +615,7 @@ function render() {
     ? remainingItems.map((item) => {
         const matrix = shape(item);
 
-        return `<button class="item" data-id="${item.id}" aria-pressed="${item.id === selectedId}"><div class="mini" style="width:${tileSize(matrix[0].length)};height:${tileSize(matrix.length)}">${svg(item, tileSize)}</div><span class="nm">${ITEMS[item.key].n}</span>${item.req ? '<span class="req">MUST</span>' : ''}</button>`;
+        return `<button class="item${drag && drag.id === item.id ? ' ghosted' : ''}" data-id="${item.id}" aria-pressed="${item.id === selectedId}"><div class="mini" style="width:${tileSize(matrix[0].length)};height:${tileSize(matrix.length)}">${svg(item, tileSize)}</div><span class="nm">${ITEMS[item.key].n}</span>${item.req ? '<span class="req">MUST</span>' : ''}</button>`;
       }).join('')
     : '<span class="nm">Everything is packed!</span>';
 
@@ -585,6 +723,276 @@ $('tray').addEventListener('click', (event) => {
   render();
 });
 
+/* =====================================================================
+   Drag & drop: hold the left mouse button on an item, drag it over the bag and let go.
+   - from the item list  -> into the bag
+   - from inside the bag -> to another spot (a bad spot sends it back where it was)
+   - from inside the bag -> out of the bag = put it back in the item list
+   Clicking still works too: click an item, then click a cell.
+   ===================================================================== */
+const DRAG_THRESHOLD = 6;
+let press = null; // pointer is down on an item, but has not moved far enough to be a drag yet
+let drag = null; // { id, fromAt, rot0 } while an item is being dragged
+let suppressClick = false;
+let dragGhost = null;
+
+function cellFromPoint(x, y) {
+  const el = document.elementFromPoint(x, y);
+  const cell = el && el.closest ? el.closest('#grid .cell') : null;
+
+  return cell ? { r: +cell.dataset.r, c: +cell.dataset.c } : null;
+}
+
+function cellPx() {
+  const cell = document.querySelector('#grid .cell');
+
+  return cell ? cell.getBoundingClientRect().width : 64;
+}
+
+function refreshGhost() {
+  const item = drag && items.find((entry) => entry.id === drag.id);
+
+  if (!item || !dragGhost) {
+    return;
+  }
+
+  const cs = cellPx();
+  const matrix = shape(item);
+  const px = (n) => n * cs + 3 * (n - 1);
+
+  dragGhost.dataset.w = px(matrix[0].length);
+  dragGhost.dataset.h = px(matrix.length);
+  dragGhost.style.width = `${dragGhost.dataset.w}px`;
+  dragGhost.style.height = `${dragGhost.dataset.h}px`;
+  dragGhost.innerHTML = svg(item, (n) => `${px(n)}px`);
+}
+
+function moveGhost(x, y) {
+  if (!dragGhost) {
+    return;
+  }
+
+  dragGhost.style.left = `${x - dragGhost.dataset.w / 2}px`;
+  dragGhost.style.top = `${y - dragGhost.dataset.h / 2}px`;
+  dragGhost.style.display = hoveredCell ? 'none' : 'block'; // over the bag the snapped preview takes over
+}
+
+function beginDrag(event) {
+  const item = items.find((entry) => entry.id === press.id);
+
+  if (!item || isDone) {
+    press = null;
+    return;
+  }
+
+  startTimer();
+  drag = { id: item.id, fromAt: item.at ? { ...item.at } : null, rot0: item.rot };
+  press = null;
+  item.at = null;
+  selectedId = item.id;
+  sfx.pick();
+
+  dragGhost = document.createElement('div');
+  dragGhost.className = 'dragghost';
+  document.body.appendChild(dragGhost);
+  document.body.classList.add('dragging');
+  refreshGhost();
+  $('msg').textContent = `Dragging ${ITEMS[item.key].n}. Press R or scroll to rotate.`;
+}
+
+function updateDrag(event) {
+  const next = cellFromPoint(event.clientX, event.clientY);
+  const changed = (next && next.r) !== (hoveredCell && hoveredCell.r) || (next && next.c) !== (hoveredCell && hoveredCell.c) || !next !== !hoveredCell;
+
+  hoveredCell = next;
+
+  if (changed) {
+    render();
+  }
+
+  moveGhost(event.clientX, event.clientY);
+}
+
+function closeDrag() {
+  drag = null;
+  press = null;
+  hoveredCell = null;
+
+  if (dragGhost) {
+    dragGhost.remove();
+    dragGhost = null;
+  }
+
+  document.body.classList.remove('dragging');
+}
+
+function abortDrag() {
+  if (!drag) {
+    return;
+  }
+
+  const item = items.find((entry) => entry.id === drag.id);
+
+  if (item && drag.fromAt) {
+    item.at = drag.fromAt;
+    item.rot = drag.rot0;
+  }
+
+  closeDrag();
+  selectedId = null;
+  render();
+}
+
+function endDrag(event) {
+  const item = items.find((entry) => entry.id === drag.id);
+  const { fromAt, rot0 } = drag;
+  const cell = cellFromPoint(event.clientX, event.clientY);
+  const name = ITEMS[item.key].n;
+  let shakeCell = null;
+
+  closeDrag();
+  suppressClick = true;
+  setTimeout(() => {
+    suppressClick = false;
+  }, 80);
+  selectedId = null;
+
+  if (cell) {
+    const origin = originPoint(item, cell.r, cell.c);
+
+    if (fits(item, origin)) {
+      item.at = origin;
+      sfx.place();
+      $('msg').textContent = fromAt ? `Moved ${name}.` : 'Packed.';
+
+      if (items.filter((entry) => entry.req).every((entry) => entry.at)) {
+        $('msg').textContent = 'Must-packs done. Add extras or finish.';
+      }
+    } else {
+      sfx.bad();
+      shakeCell = cell;
+
+      if (fromAt) {
+        item.at = fromAt;
+        item.rot = rot0;
+        $('msg').textContent = `Doesn’t fit there, so ${name} went back.`;
+      } else {
+        $('msg').textContent = 'Doesn’t fit there. Try rotating it (R) or another spot.';
+      }
+    }
+  } else {
+    $('msg').textContent = fromAt ? `Put ${name} back in your items.` : 'Dropped outside the bag. Try again.';
+  }
+
+  render();
+
+  if (shakeCell) {
+    const target = document.querySelector(`[data-r="${shakeCell.r}"][data-c="${shakeCell.c}"]`);
+
+    if (target) {
+      target.classList.add('shake');
+    }
+  }
+}
+
+document.addEventListener('pointerdown', (event) => {
+  if (isDone || !event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) {
+    return;
+  }
+
+  if (document.body.dataset.s !== 'game' || !event.target.closest) {
+    return;
+  }
+
+  const trayItem = event.target.closest('#tray .item');
+  const cell = event.target.closest('#grid .cell');
+  let id;
+
+  if (trayItem) {
+    id = +trayItem.dataset.id;
+  } else if (cell) {
+    id = occupiedCells()[`${cell.dataset.r},${cell.dataset.c}`];
+  }
+
+  if (id === undefined) {
+    return;
+  }
+
+  try {
+    event.target.releasePointerCapture(event.pointerId);
+  } catch (error) {
+    // not captured: fine
+  }
+
+  press = { id, x: event.clientX, y: event.clientY };
+});
+
+document.addEventListener('pointermove', (event) => {
+  if (drag && isDone) {
+    abortDrag();
+    return;
+  }
+
+  if (press && !drag) {
+    if (Math.hypot(event.clientX - press.x, event.clientY - press.y) < DRAG_THRESHOLD) {
+      return;
+    }
+
+    beginDrag(event);
+  }
+
+  if (drag) {
+    updateDrag(event);
+  }
+});
+
+document.addEventListener('pointerup', (event) => {
+  if (drag) {
+    if (isDone) {
+      abortDrag();
+    } else {
+      endDrag(event);
+    }
+  }
+
+  press = null; // a press that never turned into a drag is just a click
+});
+
+document.addEventListener('pointercancel', () => {
+  abortDrag();
+  press = null;
+});
+
+window.addEventListener('blur', () => {
+  abortDrag();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && drag) {
+    abortDrag();
+  }
+});
+
+document.addEventListener('wheel', (event) => {
+  if (drag) {
+    event.preventDefault();
+    rotateSelected();
+  }
+}, { passive: false });
+
+document.addEventListener('dragstart', (event) => {
+  event.preventDefault(); // no browser image-dragging; we do our own
+});
+
+// The click that follows a drag must not also select/place anything.
+document.addEventListener('click', (event) => {
+  if (suppressClick) {
+    event.stopPropagation();
+    event.preventDefault();
+    suppressClick = false;
+  }
+}, true);
+
 function rotateSelected() {
   const item = items.find((entry) => entry.id === selectedId);
 
@@ -595,6 +1003,10 @@ function rotateSelected() {
   item.rot = (item.rot + 1) % 4;
   sfx.rotate();
   render();
+
+  if (drag) {
+    refreshGhost();
+  }
 }
 
 $('rot').onclick = rotateSelected;
@@ -645,6 +1057,7 @@ function startTimer() {
 }
 
 function timeUp() {
+  abortDrag();
   stopTimer();
   sfx.lose();
   isDone = true;
@@ -655,10 +1068,9 @@ function timeUp() {
   $('stars').textContent = '☆☆☆';
   $('rTitle').textContent = 'Time’s up!';
   $('rText').textContent = 'The bag wasn’t packed in time. Try again, a little faster.';
-  $('saveBox').hidden = true;
+  $('rTotal').textContent = '';
   $('next').hidden = true;
   $('again').className = 'btn play';
-  pendingScore = null;
   $('result').classList.add('show');
 }
 
@@ -712,27 +1124,34 @@ $('done').onclick = () => {
   $('again').className = canNext ? 'btn alt small' : 'btn play';
 
   $('rText').textContent = `Items +${baseScore}, time bonus +${bonus}${junkCount ? `, junk −${penalty}` : ''}. Total ${score} points.${note}`;
-  pendingScore = { score, stars, level: levelIndex + 1 + LEVEL_OFFSET };
-  $('pname').value = getLastName();
-  $('pname').disabled = false;
-  $('saveScore').disabled = false;
-  $('saveScore').textContent = 'Save score';
-  $('saveBox').hidden = false;
+
+  const name = getLastName() || 'Player';
+  const result = recordScore(currentTheme, name, levelIndex, score, stars);
+  const label = THEMES[currentTheme].label;
+
+  $('rTotal').textContent = result.saved
+    ? `${name} · ${label} total: ${result.score} pts (${result.done}/${LEVELS.length} levels). Best on this level: ${result.levelBest}.`
+    : 'Could not save your score on this device.';
+  lbTheme = currentTheme;
+  lastHighlight = result.key;
   $('result').classList.add('show');
   render();
-  $('pname').focus();
 };
 
-$('saveScore').onclick = saveCurrentScore;
+$('saveName').onclick = confirmName;
+$('cancelName').onclick = closeName;
 $('pname').addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
-    saveCurrentScore();
+    confirmName();
+  } else if (event.key === 'Escape') {
+    closeName();
   }
 });
+$('nameBtn').onclick = () => openName();
 
 $('lbClear').onclick = () => {
   if (confirm('Clear all saved scores?')) {
-    storeScores([]);
+    storeBoard({});
     renderLeaderboard();
   }
 };
@@ -745,7 +1164,7 @@ function show(nextScreen) {
   }
 
   if (nextScreen === 'lb') {
-    renderLeaderboard();
+    renderLeaderboard(lastHighlight);
   }
 
   if (nextScreen === 'levels') {
@@ -763,10 +1182,16 @@ document.addEventListener('click', (event) => {
   }
 });
 
-$('play').onclick = () => show('levels');
+$('play').onclick = () => {
+  if (getLastName()) {
+    show('levels');
+  } else {
+    openName(() => show('levels'));
+  }
+};
 $('toLb').onclick = () => {
   $('result').classList.remove('show');
-  lbLevel = levelIndex + 1 + LEVEL_OFFSET;
+  lbTheme = currentTheme;
   show('lb');
 };
 $('gameBack').onclick = $('toLevels').onclick = () => {
@@ -792,7 +1217,8 @@ $('lbTabs').addEventListener('click', (event) => {
   const tab = event.target.closest('.tab');
 
   if (tab) {
-    lbLevel = +tab.dataset.level;
+    lbTheme = tab.dataset.theme;
+    lastHighlight = null;
     renderLeaderboard();
   }
 });
@@ -886,39 +1312,221 @@ const SPORTS_LEVELS = [
   },
 ];
 
-const ORIGINAL_LEVELS = [...LEVELS];
+const SCHOOL_ITEMS = {
+  ballpen: { n: 'Ball pen', pts: 10, s: [[1], [1]] },
+  pencil: { n: 'Pencil', pts: 10, s: [[1], [1], [1]] },
+  eraser: { n: 'Eraser', pts: 5, s: [[1]] },
+  ruler: { n: 'Ruler', pts: 10, s: [[1, 1, 1]] },
+  glue: { n: 'Glue stick', pts: 5, s: [[1]] },
+  highlighter: { n: 'Highlighter', pts: 10, s: [[1], [1]] },
+  calculator: { n: 'Calculator', pts: 20, s: [[1], [1]] },
+  scissors: { n: 'Scissors', pts: 10, s: [[1, 1], [1, 0]] },
+  idcard: { n: 'School ID', pts: 15, s: [[1, 1]] },
+  notebook: { n: 'Notebook', pts: 25, s: [[1, 1], [1, 1]] },
+  yellowpad: { n: 'Yellow pad', pts: 30, s: [[1, 1], [1, 1], [1, 1]] },
+  lunchbox: { n: 'Lunchbox', pts: 25, s: [[1, 1, 1], [1, 1, 1]] },
+  paperball: { n: 'Crumpled paper', pts: 0, junk: 1, s: [[1]] },
+  gum: { n: 'Old gum', pts: 0, junk: 1, s: [[1]] },
+  slip: { n: 'Detention slip', pts: 0, junk: 1, s: [[1], [1]] },
+};
 
-// One shared leaderboard: Original levels are 1-4, Sports levels are saved as 5-8.
-let LEVEL_OFFSET = 0;
+Object.assign(ITEMS, SCHOOL_ITEMS);
 
-const ALL_LEVELS = [
-  ...ORIGINAL_LEVELS.map((level, index) => ({ ...level, label: `${index + 1}. ${level.n}` })),
-  ...SPORTS_LEVELS.map((level, index) => ({ ...level, label: `Sports ${index + 1}. ${level.n}` })),
+const SCHOOL_LEVELS = [
+  {
+    n: 'Pencil Case',
+    bag: 'pencilcase',
+    w: 4,
+    h: 3,
+    time: 45,
+    penalty: 25,
+    req: ['ballpen', 'pencil', 'eraser'],
+    extra: ['ruler', 'glue'],
+    junk: ['paperball'],
+  },
+  {
+    n: 'Satchel',
+    bag: 'satchel',
+    w: 5,
+    h: 4,
+    time: 50,
+    penalty: 30,
+    req: ['notebook', 'ballpen', 'pencil', 'idcard', 'calculator'],
+    extra: ['highlighter', 'eraser', 'glue'],
+    junk: ['paperball', 'gum'],
+  },
+  {
+    n: 'Backpack',
+    bag: 'backpack',
+    w: 6,
+    h: 5,
+    time: 55,
+    penalty: 40,
+    req: ['laptop', 'yellowpad', 'notebook', 'ballpen', 'pencil', 'eraser'],
+    extra: ['bottle', 'glue'],
+    junk: ['paperball', 'gum', 'slip'],
+  },
+  {
+    n: 'Locker',
+    bag: 'locker',
+    w: 7,
+    h: 6,
+    time: 60,
+    penalty: 50,
+    blocked: [[0, 3], [1, 3]],
+    req: ['laptop', 'book', 'yellowpad', 'notebook', 'calculator', 'ballpen', 'pencil', 'idcard'],
+    extra: ['bottle', 'highlighter'],
+    junk: ['paperball', 'gum', 'slip', 'wrapper'],
+  },
+  {
+    n: 'Finals Day',
+    bag: 'trolley',
+    w: 8,
+    h: 6,
+    time: 85,
+    penalty: 60,
+    blocked: [[0, 0], [0, 7], [5, 0], [5, 7]],
+    req: ['laptop', 'book', 'yellowpad', 'notebook', 'lunchbox', 'calculator', 'ballpen', 'pencil', 'idcard', 'ruler'],
+    extra: ['eraser', 'glue'],
+    junk: ['paperball', 'gum', 'slip', 'wrapper'],
+  },
 ];
+const VACATION_ITEMS = {
+  // new items (need images/<key>.svg)
+  sunscreen: { n: 'Sunscreen', pts: 15, s: [[1], [1]] },
+  flipflops: { n: 'Flip-flops', pts: 20, s: [[1, 1], [1, 1]] },
+  snorkel: { n: 'Snorkel', pts: 20, s: [[1, 0], [1, 0], [1, 1]] },
+  // new junk
+  meltedicecream: { n: 'Melted ice cream', pts: 0, junk: 1, s: [[1], [1]] },
+  seashell: { n: 'Seashell', pts: 0, junk: 1, s: [[1]] },
+  seaweed: { n: 'Tangled seaweed', pts: 0, junk: 1, s: [[1, 1]] },
+  coconut: { n: 'Empty coconut', pts: 0, junk: 1, s: [[1]] },
+};
+
+Object.assign(ITEMS, VACATION_ITEMS);
+
+const VACATION_LEVELS = [
+  {
+    n: 'Beach Pouch',
+    bag: 'beachpouch',
+    w: 4,
+    h: 3,
+    time: 45,
+    penalty: 25,
+    req: ['phone', 'wallet', 'sunglasses', 'keys'],
+    extra: ['sunscreen', 'earbuds'],
+    junk: ['seashell'],
+  },
+  {
+    n: 'Beach Tote',
+    bag: 'beachtote',
+    w: 5,
+    h: 4,
+    time: 50,
+    penalty: 30,
+    req: ['phone', 'wallet', 'sunglasses', 'towel', 'keys'],
+    extra: ['sunscreen', 'flipflops', 'earbuds'],
+    junk: ['seashell', 'meltedicecream'],
+  },
+  {
+    n: 'Day Backpack',
+    bag: 'daybackpack',
+    w: 6,
+    h: 5,
+    time: 55,
+    penalty: 40,
+    req: ['phone', 'wallet', 'sunglasses', 'towel', 'passport', 'keys', 'umbrella'],
+    extra: ['camera', 'snorkel', 'flipflops'],
+    junk: ['seashell', 'meltedicecream', 'coconut'],
+  },
+  {
+    n: 'Carry-On',
+    bag: 'carryon',
+    w: 7,
+    h: 6,
+    time: 60,
+    penalty: 50,
+    blocked: [[0, 6], [5, 0]],
+    req: ['phone', 'wallet', 'passport', 'sunglasses', 'towel', 'umbrella', 'camera', 'shoes', 'keys'],
+    extra: ['snorkel', 'flipflops', 'bottle'],
+    junk: ['seashell', 'meltedicecream', 'coconut', 'seaweed'],
+  },
+  {
+    n: 'Grand Getaway',
+    bag: 'getaway',
+    w: 8,
+    h: 6,
+    time: 85,
+    penalty: 60,
+    blocked: [[2, 3], [2, 4], [3, 3], [3, 4]],
+    req: ['tablet', 'umbrella', 'camera', 'shoes', 'towel', 'wallet', 'phone', 'passport', 'sunglasses', 'keys'],
+    extra: ['flipflops', 'snorkel', 'sunscreen'],
+    junk: ['seashell', 'meltedicecream', 'coconut', 'seaweed'],
+  },
+];
+
+const ORIGINAL_LEVELS = [...LEVELS];
 
 // Each theme has its own levels, progress (stars/unlocks) and leaderboard.
 const THEMES = {
   original: {
+    label: 'Original',
     levels: ORIGINAL_LEVELS,
     progressKey: 'fitnpack:progress',
-    offset: 0,
+  },
+  school: {
+    label: 'School',
+    levels: SCHOOL_LEVELS,
+    progressKey: 'fitnpack:progress:school',
   },
   sports: {
+    label: 'Sports',
     levels: SPORTS_LEVELS,
     progressKey: 'fitnpack:progress:sports',
-    offset: ORIGINAL_LEVELS.length,
+  },
+   vacation: {
+    label: 'Vacation',
+    levels: VACATION_LEVELS,
+    progressKey: 'fitnpack:progress:vacation',
   },
 };
 
+const THEME_MUSIC = {
+  original: 'images/audio/intro.mp3',
+  school: 'images/audio/school.mp3',
+  sports: 'images/audio/intro.mp3',
+  vacation: 'images/audio/vacation.mp3',
+};
+let bgmSrc = THEME_MUSIC.original;
+
+function setThemeMusic(key) {
+  const src = THEME_MUSIC[key] || THEME_MUSIC.original;
+
+  if (src === bgmSrc) {
+    return;
+  }
+
+  bgmSrc = src;
+  bgm.src = src;
+  bgm.load();
+
+  if (musicOn) {
+    bgm.play().catch(() => {});
+  }
+}
+
 function applyTheme(name) {
-  const theme = THEMES[name] || THEMES.original;
+  const key = THEMES[name] ? name : 'original';
+  const theme = THEMES[key];
+
+  currentTheme = key;
+  setThemeMusic(key);
 
   LEVELS.splice(0, LEVELS.length, ...theme.levels);
   PROGRESS_KEY = theme.progressKey;
-  LEVEL_OFFSET = theme.offset;
 
   levelIndex = 0;
-  lbLevel = 1 + LEVEL_OFFSET;
+  lbTheme = key;
   LEVEL = LEVELS[0];
   document.body.dataset.theme = name;
 }
@@ -943,22 +1551,5 @@ document.addEventListener(
   true,
 );
 
-// One-time: move scores saved earlier under the separate Sports key into the main leaderboard.
-(() => {
-  try {
-    const old = JSON.parse(localStorage.getItem('fitnpack:leaderboard:sports'));
-
-    if (Array.isArray(old)) {
-      const moved = old
-        .filter((e) => e && typeof e.score === 'number' && typeof e.name === 'string')
-        .map((e) => ({ ...e, level: (Number(e.level) || 1) + ORIGINAL_LEVELS.length }));
-
-      storeScores(trimScores([...loadScores(), ...moved]));
-      localStorage.removeItem('fitnpack:leaderboard:sports');
-    }
-  } catch (error) {
-  
-  }
-})();
-
+updateNameBtn();
 show('title');

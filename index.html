@@ -4,25 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Fit-N-Pack: Menu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Fredoka:wght@600;700&family=Patrick+Hand&family=Caveat+Brush&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
   </head>
 
-  <body>
+  <body data-theme="original">
+    <div id="decor" aria-hidden="true"></div>
+    <div id="belt" aria-hidden="true"></div>
     <section id="s-title" class="screen">
+      <img class="hero" src="images/suitcase.svg" alt="">
       <h1 class="big">Fit-N-Pack</h1>
       <p class="sub">Fit everything into the bag. From a tiny clutch to a big suitcase.</p>
 
       <div class="menu">
         <button class="btn play" id="play" type="button">Play</button>
+        <button class="btn alt" type="button" data-go="howto">How to play</button>
         <button class="btn alt" type="button" data-go="lb">Leaderboard</button>
         <button class="btn alt" type="button" data-go="about">About</button>
+        <button class="btn alt small" id="nameBtn" type="button">👤 Set nickname</button>
         <button class="btn alt small" id="musicBtn" type="button">🔊 Music: ON</button>
       </div>
     </section>
 
     <section id="s-levels" class="screen">
-      <h2>Select level</h2>
+      <h2 id="levelsTitle">Select level</h2>
       <p class="sub">Earn 2 ★ or more to unlock the next bag.</p>
       <div id="levelList" class="level-list"></div>
     <div class="row center-row">
@@ -57,7 +62,7 @@
             <p class="nm" id="reqTxt"></p>
             <div id="tray" aria-label="Items to pack"></div>
             <p id="msg" role="status" aria-live="polite"></p>
-            <p class="hint">Select an item, then tap a bag cell to place it. Select a packed item to pick it up. Press R to rotate.</p>
+            <p class="hint">Hold the mouse button on an item and drag it into the bag. Drag a packed item to move it, or drag it out of the bag to put it back. Press R or scroll the wheel to rotate. (You can also click an item, then click a cell.)</p>
 
             <div class="row">
               <button class="btn alt small" id="rot" type="button">Rotate</button>
@@ -70,13 +75,52 @@
 
     <section id="s-lb" class="screen">
       <h2>Leaderboard</h2>
-      <div id="lbTabs" class="lb-tabs" role="group" aria-label="Level"></div>
-      <p class="sub" id="lbEmpty">No scores yet for this level.</p>
+      <div id="lbTabs" class="lb-tabs" role="group" aria-label="Theme"></div>
+      <p class="sub">Theme score = your best score from each level added together.</p>
+      <p class="sub" id="lbEmpty">No scores yet for this theme.</p>
       <ol id="lbList" class="lb-list"></ol>
       <div class="row center-row">
         <button class="btn alt back" type="button" data-go="title">← Back</button>
         <button class="btn alt back" id="lbClear" type="button">Clear scores</button>
       </div>
+    </section>
+
+    <section id="s-howto" class="screen">
+      <h2 class="about-header">How to play</h2>
+      <p class="sub howto-intro">Pack the bag in four easy steps.</p>
+
+      <ol class="howto-steps">
+        <li class="howto-step">
+          <img src="images/howto-step1.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step1.svg'" alt="Step 1: click or drag an item from the items list">
+          <h3><span class="howto-num">1</span>Click/drag the item</h3>
+          <p>Hold the mouse button on an item in your list, or simply click it, to pick it up.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step2.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step2.svg'" alt="Step 2: move the item towards the bag and drop it on empty cells">
+          <h3><span class="howto-num">2</span>Move it towards the bag</h3>
+          <p>Drag it over the bag and let go on empty cells. Drag it out again to take it back.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step3.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step3.svg'" alt="Step 3: rotate the item with the R key or mouse wheel so it fits the gap">
+          <h3><span class="howto-num">3</span>Rotate based on the perspective</h3>
+          <p>Press R or scroll the mouse wheel to turn the item until it fits the space.</p>
+        </li>
+        <li class="howto-step">
+          <img src="images/howto-step4.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-step4.svg'" alt="Step 4: pack the remaining items before the timer runs out">
+          <h3><span class="howto-num">4</span>Do the others before the time runs out</h3>
+          <p>Pack every MUST item, then press Finish packing before the timer hits zero.</p>
+        </li>
+        <li class="howto-step howto-note">
+          <img src="images/howto-note.png" width="960" height="600" onerror="this.onerror=null;this.src='images/howto-note.svg'" alt="Note: junk items such as trash, receipts, wrappers and socks cost you points">
+          <div>
+            <h3><span class="howto-num howto-warn">!</span>Note</h3>
+            <p><b>Make sure to avoid putting unnecessary things in the bag!</b></p>
+            <p>Junk items like trash, receipts and wrappers take up space and reduce your points.</p>
+          </div>
+        </li>
+      </ol>
+
+      <button class="btn alt back" type="button" data-go="title">← Back</button>
     </section>
 
     <section id="s-about" class="screen">
@@ -94,10 +138,10 @@
       <h2>Themes</h2>
       <p class="select-theme">Select a Theme</p>
       <div class="menu">
-        <button class="btn alt" type="button" data-theme="original">Original</button>
-        <button class="btn alt" type="button" data-theme="school">School</button>
-        <button class="btn alt" type="button" data-theme="vacation">Vacation</button>
-        <button class="btn alt" type="button" data-theme="sports">Sports</button>
+        <button class="btn alt" type="button" data-theme="original"><img src="images/suitcase.svg" alt="">Original</button>
+        <button class="btn alt" type="button" data-theme="school"><img src="images/backpack.svg" alt="">School</button>
+        <button class="btn alt" type="button" data-theme="vacation"><img src="images/sunglasses.svg" alt="">Vacation</button>
+        <button class="btn alt" type="button" data-theme="sports"><img src="images/ball.svg" alt="">Sports</button>
       </div>
       <button class="btn alt back" type="button" data-go="levels">← Back</button>
     </section>
@@ -111,13 +155,7 @@
         <h2 id="rTitle"></h2>
         <p id="rText"></p>
 
-        <div id="saveBox" class="savebox" hidden>
-          <label for="pname">Your name</label>
-          <div class="row center-row">
-            <input id="pname" type="text" maxlength="12" autocomplete="off" placeholder="Player">
-            <button class="btn play small" id="saveScore" type="button">Save score</button>
-          </div>
-        </div>
+        <p id="rTotal" class="rtotal"></p>
 
         <div class="row center-row">
           <button class="btn play" id="next" type="button" hidden>Next level</button>
@@ -128,6 +166,23 @@
       </div>
     </div>
 
+    <div id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+      <div class="box">
+        <h2 id="nameTitle">Your nickname</h2>
+        <p class="sub">Pick a nickname before you play. Your theme scores are saved to the leaderboard under it.</p>
+        <div class="savebox">
+          <label for="pname">Nickname (max 12 characters)</label>
+          <input id="pname" type="text" maxlength="12" autocomplete="off" placeholder="Player">
+          <p id="nameErr" class="nameerr" role="alert"></p>
+        </div>
+        <div class="row center-row">
+          <button class="btn alt small" id="cancelName" type="button">Cancel</button>
+          <button class="btn play small" id="saveName" type="button">Save &amp; continue</button>
+        </div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="images/audio/theme-fx.js"></script>
   </body>
 </html>
