@@ -466,6 +466,17 @@ h2 {
   }
 }
 
+@media (max-width: 560px) {
+  .screen {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  #grid {
+    --cs: min(64px, calc((100vw - 89px) / var(--w)));
+  }
+}
+
 
 .savebox {
   margin-top: 14px;
