@@ -35,7 +35,7 @@
 
   const picture = (name) => {
     const img = new Image();
-    img.src = `images/${name}.svg`;
+    img.src = `Images/${name}.svg`;
     img.alt = '';
     img.draggable = false;
     return img;
@@ -72,7 +72,7 @@
     const hero = document.querySelector('.hero');
 
     if (hero) {
-      hero.src = `images/${set.hero}.svg`;
+      hero.src = `Images/${set.hero}.svg`;
     }
   }
 

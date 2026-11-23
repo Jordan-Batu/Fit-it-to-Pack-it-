@@ -446,7 +446,7 @@ function svg(item, sizeFn) {
   const width = base[0].length;
   const height = base.length;
 
-  return `<img src="images/${item.key}.svg" alt="" draggable="false" style="width:${sizeFn(width)};height:${sizeFn(height)};transform:translate(-50%,-50%) rotate(${item.rot * 90}deg)">`;
+  return `<img src="Images/${item.key}.svg" alt="" draggable="false" style="width:${sizeFn(width)};height:${sizeFn(height)};transform:translate(-50%,-50%) rotate(${item.rot * 90}deg)">`;
 }
 
 // Builds the HTML picture used by a packed item or a placement preview.
@@ -473,7 +473,7 @@ function renderLevels() {
     card.disabled = locked;
 
     const art = document.createElement('img');
-    art.src = `images/${level.bag}.svg`;
+    art.src = `Images/${level.bag}.svg`;
     art.alt = '';
 
     const title = document.createElement('b');
@@ -1251,7 +1251,7 @@ $('lbTabs').addEventListener('click', (event) => {
 });
 
 /* ---------- Background music ---------- */
-const bgm = new Audio('images/audio/intro.mp3');
+const bgm = new Audio('Images/audio/intro.mp3');
 bgm.loop = true;
 bgm.volume = 0.3;
 let musicOn = true;
@@ -1421,7 +1421,7 @@ const SCHOOL_LEVELS = [
   },
 ];
 const VACATION_ITEMS = {
-  // new items (need images/<key>.svg)
+  // new items (need Images/<key>.svg)
   sunscreen: { n: 'Sunscreen', pts: 15, s: [[1], [1]] },
   flipflops: { n: 'Flip-flops', pts: 20, s: [[1, 1], [1, 1]] },
   snorkel: { n: 'Snorkel', pts: 20, s: [[1, 0], [1, 0], [1, 1]] },
@@ -1522,10 +1522,10 @@ const THEMES = {
 
 // Every theme can use a matching background-music file.
 const THEME_MUSIC = {
-  original: 'images/audio/intro.mp3',
-  school: 'images/audio/school.mp3',
-  sports: 'images/audio/sports.mp3',
-  vacation: 'images/audio/vacation.mp3',
+  original: 'Images/audio/intro.mp3',
+  school: 'Images/audio/school.mp3',
+  sports: 'Images/audio/sports.mp3',
+  vacation: 'Images/audio/vacation.mp3',
 };
 let bgmSrc = THEME_MUSIC.original;
 
